@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { translate, type Lang, type TranslationKey } from "./i18n/translate";
+import {
+  calculateSustainabilityScore,
+  type SustainabilityGrade,
+  type SustainabilityScoreResult,
+} from "./scoring";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -26,7 +31,7 @@ export interface Product {
   countryOfOrigin: string;
   co2Kg: number | null;
   packaging: string;
-  repairability: number | null; // 1-5
+  repairability: number | null; // CSV is generally 1-5; scoring normalizes defensively.
   lifespanYears: number | null;
   recyclablePct: number | null; // 0-100 (some rows store 0-1, normalised below)
   ecoLabel: string;
@@ -43,6 +48,11 @@ export interface Product {
   brand: string;
   /** A composite 0-100 sustainability score used for badges/sorting. */
   sustainabilityScore: number;
+  sustainabilityGrade: SustainabilityGrade;
+  sustainabilityConfidence: number;
+  sustainability: SustainabilityScoreResult;
+  isSustainable: boolean;
+  valuePerYear: number | null;
 }
 
 export interface ProductQuery {
@@ -55,6 +65,10 @@ export interface ProductQuery {
   warehouse?: string;
   minPrice?: number;
   maxPrice?: number;
+  grade?: SustainabilityGrade;
+  minScore?: number;
+  minLifespan?: number;
+  valuePerYear?: "best";
   sort?: SortKey;
   page?: number;
   pageSize?: number;
@@ -66,6 +80,9 @@ export type SortKey =
   | "price-desc"
   | "rating"
   | "sustainability"
+  | "lifespan"
+  | "value"
+  | "combined"
   | "popular";
 
 export interface Facet {
@@ -198,37 +215,6 @@ function normaliseRecyclable(raw: number | null): number | null {
   return raw <= 1 ? Math.round(raw * 100) : Math.round(raw);
 }
 
-function deriveSustainabilityScore(p: {
-  co2Kg: number | null;
-  repairability: number | null;
-  recyclablePct: number | null;
-  lifespanYears: number | null;
-  ecoLabel: string;
-  carbonNeutral: boolean;
-  packaging: string;
-}): number {
-  let score = 40; // neutral baseline
-
-  if (p.carbonNeutral) score += 15;
-  if (p.ecoLabel) score += 12;
-
-  if (p.recyclablePct != null) score += (p.recyclablePct / 100) * 12;
-  if (p.repairability != null) score += (p.repairability / 5) * 10;
-  if (p.lifespanYears != null) score += Math.min(p.lifespanYears, 10) * 1;
-
-  if (p.co2Kg != null) {
-    // lower CO2 is better; ~0kg -> +10, ~75kg -> 0
-    score += Math.max(0, 10 - p.co2Kg / 7.5);
-  }
-
-  const pkg = p.packaging.toLowerCase();
-  if (pkg.includes("biodegradable") || pkg.includes("no packaging")) score += 6;
-  else if (pkg.includes("recyclable") || pkg.includes("minimal")) score += 4;
-  else if (pkg.includes("foam") || pkg === "plastic") score -= 4;
-
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
-
 // ---------------------------------------------------------------------------
 // Loading & caching
 // ---------------------------------------------------------------------------
@@ -256,11 +242,28 @@ export function getAllProducts(): Product[] {
       const ecoLabel = r["Eco_Label"] ?? "";
       const carbonNeutral = bool(r["Carbon_Neutral_Certified"]);
       const packaging = r["Packaging_Type"] ?? "";
+      const sameDay = bool(r["IsSameDayAvailable"]);
+      const nextDay = bool(r["IsNextDayAvailable"]);
+      const normalDelivery = bool(r["IsNormalDeliveryAvailable"]);
+      const category = r["Category"] ?? "";
+      const sustainability = calculateSustainabilityScore({
+        category,
+        co2Kg,
+        lifespanYears,
+        repairability,
+        recyclablePct,
+        packaging,
+        ecoLabel,
+        carbonNeutral,
+        sameDay,
+        nextDay,
+        normalDelivery,
+      });
 
       return {
         id,
         name: r["Product_Name"],
-        category: r["Category"] ?? "",
+        category,
         subcategory: r["Subcategory"] ?? "",
         unitsSold,
         revenueUsd: num(r["Estimated_Revenue_in_2025_USD"]) ?? 0,
@@ -270,9 +273,9 @@ export function getAllProducts(): Product[] {
         warehouseCode: r["WarehouseCode"] ?? "",
         warehouseGln: r["WarehouseGLN"] ?? "",
         warehouseAddress: r["WarehouseAddress"] ?? "",
-        sameDay: bool(r["IsSameDayAvailable"]),
-        nextDay: bool(r["IsNextDayAvailable"]),
-        normalDelivery: bool(r["IsNormalDeliveryAvailable"]),
+        sameDay,
+        nextDay,
+        normalDelivery,
         countryOfOrigin: r["Country_Of_Origin"] ?? "",
         co2Kg,
         packaging,
@@ -286,15 +289,15 @@ export function getAllProducts(): Product[] {
         rating: deriveRating(id),
         reviewCount: deriveReviewCount(id, unitsSold),
         brand: deriveBrand(r["Product_Name"]),
-        sustainabilityScore: deriveSustainabilityScore({
-          co2Kg,
-          repairability,
-          recyclablePct,
-          lifespanYears,
-          ecoLabel,
-          carbonNeutral,
-          packaging,
-        }),
+        sustainabilityScore: sustainability.score,
+        sustainabilityGrade: sustainability.grade,
+        sustainabilityConfidence: sustainability.confidence,
+        sustainability,
+        isSustainable: sustainability.isSustainable,
+        valuePerYear:
+          lifespanYears != null && lifespanYears > 0
+            ? Math.round((priceFrom / lifespanYears) * 100) / 100
+            : null,
       };
     });
 
@@ -317,7 +320,7 @@ export function productSpecLine(p: Product, lang: Lang = "nl"): string {
   if (p.lifespanYears != null)
     parts.push(`${tr("row.lifespan")}: ${p.lifespanYears} ${tr("row.lifespanUnit")}`);
   if (p.repairability != null)
-    parts.push(`${tr("row.repairable")}: ${p.repairability}/5`);
+    parts.push(`${tr("row.repairable")}: ${p.repairability}${p.repairability <= 5 ? "/5" : "/10"}`);
   if (p.co2Kg != null) parts.push(`CO₂: ${p.co2Kg} kg`);
   return parts.filter(Boolean).join(" • ");
 }
@@ -335,7 +338,7 @@ export function productBlurb(p: Product, lang: Lang = "nl"): string {
 
 /** True for products good enough to earn a "Good Choice" eco badge. */
 export function isGoodChoice(p: Product): boolean {
-  return p.sustainabilityScore >= 65;
+  return p.isSustainable;
 }
 
 export function getProductsByIds(ids: string[]): Product[] {
@@ -395,6 +398,12 @@ function matches(p: Product, q: ProductQuery): boolean {
   if (q.warehouse && p.warehouseName !== q.warehouse) return false;
   if (q.minPrice != null && p.price < q.minPrice) return false;
   if (q.maxPrice != null && p.price > q.maxPrice) return false;
+  if (q.grade && p.sustainabilityGrade !== q.grade) return false;
+  if (q.minScore != null && p.sustainabilityScore < q.minScore) return false;
+  if (q.minLifespan != null && (p.lifespanYears == null || p.lifespanYears < q.minLifespan))
+    return false;
+  if (q.valuePerYear === "best" && (p.valuePerYear == null || p.valuePerYear > p.price * 0.65))
+    return false;
   return true;
 }
 
@@ -409,6 +418,12 @@ function sortProducts(items: Product[], sort: SortKey, q?: ProductQuery): Produc
       return arr.sort((a, b) => b.rating - a.rating);
     case "sustainability":
       return arr.sort((a, b) => b.sustainabilityScore - a.sustainabilityScore);
+    case "lifespan":
+      return arr.sort((a, b) => (b.lifespanYears ?? -1) - (a.lifespanYears ?? -1));
+    case "value":
+      return arr.sort((a, b) => (a.valuePerYear ?? Infinity) - (b.valuePerYear ?? Infinity));
+    case "combined":
+      return arr.sort((a, b) => combinedScore(b) - combinedScore(a));
     case "popular":
       return arr.sort((a, b) => b.unitsSold - a.unitsSold);
     case "relevance":
@@ -424,6 +439,33 @@ function sortProducts(items: Product[], sort: SortKey, q?: ProductQuery): Produc
       });
     }
   }
+}
+
+function combinedScore(p: Product): number {
+  const delivery = p.normalDelivery ? 100 : p.nextDay ? 75 : p.sameDay ? 55 : 65;
+  const value = p.valuePerYear == null ? 50 : Math.max(0, 100 - p.valuePerYear);
+  return p.sustainabilityScore * 0.55 + delivery * 0.15 + value * 0.2 + p.rating * 2;
+}
+
+export function getGreenerAlternatives(product: Product, limit = 4): Product[] {
+  const priceLow = product.price * 0.65;
+  const priceHigh = product.price * 1.45;
+  const all = getAllProducts().filter(
+    (p) =>
+      p.id !== product.id &&
+      p.category === product.category &&
+      p.sustainabilityScore > product.sustainabilityScore,
+  );
+  const similarPrice = all.filter((p) => p.price >= priceLow && p.price <= priceHigh);
+  return (similarPrice.length ? similarPrice : all)
+    .sort((a, b) => b.sustainabilityScore - a.sustainabilityScore)
+    .slice(0, limit);
+}
+
+export function getCategoryAverageScore(category: string): number {
+  const items = getAllProducts().filter((p) => p.category === category);
+  if (items.length === 0) return 60;
+  return Math.round(items.reduce((sum, p) => sum + p.sustainabilityScore, 0) / items.length);
 }
 
 export function searchProducts(query: ProductQuery): SearchResult {

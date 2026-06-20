@@ -39,6 +39,10 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
   const activeSub = searchParams.get("subcategory");
   const activeEco = searchParams.get("ecoLabel");
   const activeWarehouse = searchParams.get("warehouse");
+  const activeGrade = searchParams.get("grade");
+  const activeMinScore = searchParams.get("minScore");
+  const activeMinLifespan = searchParams.get("minLifespan");
+  const activeValue = searchParams.get("valuePerYear");
   const carbonNeutral = searchParams.get("carbonNeutral") === "true";
   const sameDay = searchParams.get("sameDay") === "true";
 
@@ -47,6 +51,10 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
     activeSub ||
     activeEco ||
     activeWarehouse ||
+    activeGrade ||
+    activeMinScore ||
+    activeMinLifespan ||
+    activeValue ||
     carbonNeutral ||
     sameDay ||
     searchParams.get("minPrice") ||
@@ -120,6 +128,43 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
       </FilterGroup>
 
       <FilterGroup title={t("filter.sustainability")}>
+        <div className="mb-3">
+          <p className="mb-1 text-xs font-bold uppercase text-zinc-500">Grade</p>
+          <div className="flex flex-wrap gap-1">
+            {["A", "B", "C", "D", "E"].map((grade) => (
+              <button
+                key={grade}
+                type="button"
+                onClick={() => setParam("grade", activeGrade === grade ? null : grade)}
+                className={`rounded-full px-2 py-1 text-xs font-bold ${
+                  activeGrade === grade
+                    ? "bg-bol-green text-white"
+                    : "bg-bol-green/10 text-bol-green"
+                }`}
+              >
+                {grade}
+              </button>
+            ))}
+          </div>
+        </div>
+        <NumberFilter
+          label="Minimum score"
+          current={activeMinScore}
+          placeholder="75"
+          onApply={(value) => setParam("minScore", value || null)}
+        />
+        <NumberFilter
+          label="Minimum lifespan"
+          current={activeMinLifespan}
+          placeholder="3"
+          onApply={(value) => setParam("minLifespan", value || null)}
+        />
+        <CheckRow
+          label="Best price/lifespan value"
+          checked={activeValue === "best"}
+          onChange={() => setParam("valuePerYear", activeValue === "best" ? null : "best")}
+        />
+        <div className="my-3 border-t border-bol-border" />
         <CheckRow
           label={t("filter.carbonNeutral")}
           checked={carbonNeutral}
@@ -158,6 +203,43 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
         />
       </FilterGroup>
     </aside>
+  );
+}
+
+function NumberFilter({
+  label,
+  current,
+  placeholder,
+  onApply,
+}: {
+  label: string;
+  current: string | null;
+  placeholder: string;
+  onApply: (value: string) => void;
+}) {
+  const [value, setValue] = useState(current ?? "");
+
+  return (
+    <label className="mb-2 block text-sm text-zinc-700">
+      <span className="mb-1 block text-xs font-medium text-zinc-500">{label}</span>
+      <div className="flex gap-2">
+        <input
+          type="number"
+          inputMode="decimal"
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => setValue(e.target.value)}
+          className="min-w-0 flex-1 rounded border border-bol-border px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-bol-blue"
+        />
+        <button
+          type="button"
+          onClick={() => onApply(value)}
+          className="rounded bg-bol-blue px-2 text-xs font-bold text-white hover:bg-bol-blue-dark"
+        >
+          OK
+        </button>
+      </div>
+    </label>
   );
 }
 

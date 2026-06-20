@@ -11,6 +11,9 @@ const OPTIONS: { value: string; key: TranslationKey }[] = [
   { value: "price-desc", key: "sort.priceDesc" },
   { value: "rating", key: "sort.rating" },
   { value: "sustainability", key: "sort.sustainability" },
+  { value: "lifespan", key: "sort.lifespan" },
+  { value: "value", key: "sort.value" },
+  { value: "combined", key: "sort.combined" },
 ];
 
 export default function SortSelect({ current }: { current: string }) {

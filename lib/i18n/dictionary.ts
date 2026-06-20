@@ -109,6 +109,12 @@ export const dictionary = {
   "sort.priceDesc": { nl: "Prijs hoog - laag", en: "Price high - low" },
   "sort.rating": { nl: "Beoordeling", en: "Rating" },
   "sort.sustainability": { nl: "Duurzaamheid", en: "Sustainability" },
+  "sort.lifespan": { nl: "Levensduur", en: "Lifespan" },
+  "sort.value": { nl: "Prijs per levensjaar", en: "Price per year of use" },
+  "sort.combined": {
+    nl: "Prijs, levering & duurzaamheid",
+    en: "Price, delivery & sustainability",
+  },
 
   // ---- Filters ----
   "filter.clearAll": { nl: "Wis alle filters", en: "Clear all filters" },

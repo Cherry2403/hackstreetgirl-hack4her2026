@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,11 +7,6 @@ import { CompareProvider } from "@/components/compare/CompareContext";
 import CompareTray from "@/components/compare/CompareTray";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { getLang } from "@/lib/i18n/server";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang();
@@ -37,7 +31,7 @@ export default async function RootLayout({
   const lang = await getLang();
 
   return (
-    <html lang={lang} className={`${geistSans.variable} h-full antialiased`}>
+    <html lang={lang} className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-bol-gray">
         <LanguageProvider lang={lang}>
           <CompareProvider>

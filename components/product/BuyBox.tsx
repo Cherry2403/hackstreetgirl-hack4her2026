@@ -2,11 +2,19 @@
 
 import { useState } from "react";
 import type { Product } from "@/lib/products";
+import type { ImpactAnalogy } from "@/lib/analogy";
 import Price from "@/components/Price";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
+import SustainabilityDrawer from "@/components/SustainabilityDrawer";
 
 /** bol-style right-hand purchase column. */
-export default function BuyBox({ product }: { product: Product }) {
+export default function BuyBox({
+  product,
+  analogy,
+}: {
+  product: Product;
+  analogy: ImpactAnalogy;
+}) {
   const { t } = useLanguage();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -19,7 +27,10 @@ export default function BuyBox({ product }: { product: Product }) {
 
   return (
     <div className="rounded-xl border border-bol-border bg-white p-4">
-      <Price amount={product.price} size="lg" className="text-[#e2240f]" />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Price amount={product.price} size="lg" className="text-[#e2240f]" />
+        <SustainabilityDrawer product={product} analogy={analogy} />
+      </div>
 
       <p className="mt-2 flex items-center gap-1 text-sm text-bol-green">
         <ClockIcon className="h-4 w-4" /> {delivery}

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import {
   getProductById,
   getRelatedProducts,
+  getCategoryAverageScore,
 } from "@/lib/products";
+import { analogyForProduct } from "@/lib/analogy";
 import { buildSpecGroups } from "@/lib/specs";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
@@ -13,6 +15,7 @@ import Reviews from "@/components/product/Reviews";
 import ProductRail from "@/components/ProductRail";
 import StarRating from "@/components/StarRating";
 import { SustainabilityTags } from "@/components/SustainabilityBadge";
+import AlternativeProducts from "@/components/AlternativeProducts";
 import AddToCompareButton from "@/components/compare/AddToCompareButton";
 import { getT } from "@/lib/i18n/server";
 import {
@@ -39,6 +42,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
   const alsoViewed = getRelatedProducts(product, 8).slice().reverse();
   const specGroups = buildSpecGroups(product, lang);
   const description = buildDescription(product, lang);
+  const analogy = analogyForProduct(product, getCategoryAverageScore(product.category));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-4">
@@ -108,7 +112,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
 
         {/* Buy column */}
         <div className="lg:row-span-2">
-          <BuyBox product={product} />
+          <BuyBox product={product} analogy={analogy} />
         </div>
       </div>
 
@@ -116,6 +120,8 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
       <div className="mt-8">
         <SustainabilityPanel product={product} />
       </div>
+
+      <AlternativeProducts product={product} />
 
       {/* Description */}
       <section className="mt-8 max-w-3xl">

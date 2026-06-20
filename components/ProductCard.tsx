@@ -33,7 +33,7 @@ export default async function ProductCard({
           alt={product.name}
           className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]"
         />
-        {product.sustainabilityScore >= 70 && (
+        {product.sustainabilityScore > 75 && (
           <span className="absolute left-1.5 top-1.5">
             <SustainabilityScore score={product.sustainabilityScore} />
           </span>
@@ -49,7 +49,13 @@ export default async function ProductCard({
       </div>
 
       <div className="mt-auto pt-2">
-        <Price amount={product.price} size="md" />
+        <div className="flex items-center justify-between gap-2">
+          <Price amount={product.price} size="md" />
+          <SustainabilityScore score={product.sustainabilityScore} />
+        </div>
+        {product.sustainabilityScore > 75 && (
+          <p className="mt-1 text-[11px] font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
+        )}
         <p className="mt-1 text-[11px] text-zinc-500">
           {product.sameDay
             ? t("card.today")

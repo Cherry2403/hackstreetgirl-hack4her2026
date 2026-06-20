@@ -12,7 +12,7 @@
   --color-bol-link: #0a51c4;
   --color-bol-green: #2a8703;
 
-  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-sans: Arial, Helvetica, sans-serif;
 }
 
 html {

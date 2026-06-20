@@ -11,7 +11,7 @@ import StarRating from "./StarRating";
 import EnergyLabel from "./EnergyLabel";
 import AddToCartButton from "./AddToCartButton";
 import CompareCheckbox from "./compare/CompareCheckbox";
-import { GoodChoiceBadge } from "./SustainabilityBadge";
+import { GoodChoiceBadge, SustainabilityScore } from "./SustainabilityBadge";
 import { getT } from "@/lib/i18n/server";
 
 /** bol-style horizontal search-result row. */
@@ -79,7 +79,13 @@ export default async function ProductListRow({ product }: { product: Product }) 
 
       {/* Right: price + buy */}
       <div className="flex flex-col items-start gap-2 lg:items-end lg:text-right">
-        <Price amount={product.price} size="lg" className="text-[#e2240f]" />
+        <div className="flex items-center gap-2 lg:justify-end">
+          <Price amount={product.price} size="lg" className="text-[#e2240f]" />
+          <SustainabilityScore score={product.sustainabilityScore} />
+        </div>
+        {product.sustainabilityScore > 75 && (
+          <p className="text-xs font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
+        )}
         <EnergyLabel product={product} />
         <p className="flex items-center gap-1 text-sm text-bol-green">
           <ClockIcon className="h-4 w-4" /> {delivery}

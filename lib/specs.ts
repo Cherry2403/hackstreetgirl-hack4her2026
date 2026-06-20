@@ -45,7 +45,10 @@ export function buildSpecGroups(p: Product, lang: Lang = "nl"): SpecGroup[] {
         { label: t("spec.packaging"), value: p.packaging || dash },
         {
           label: t("spec.repairScore"),
-          value: p.repairability != null ? `${p.repairability} / 5` : dash,
+          value:
+            p.repairability != null
+              ? `${p.repairability} / ${p.repairability <= 5 ? 5 : 10}`
+              : dash,
         },
         {
           label: t("spec.recyclableMaterial"),

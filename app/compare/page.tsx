@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { getProductsByIds, getRelatedProducts } from "@/lib/products";
+import { analogyBetweenProducts } from "@/lib/analogy";
 import { buildSpecGroups, buildSpecMap } from "@/lib/specs";
 import CompareTable from "@/components/compare/CompareTable";
 import CompareSuggestionCard from "@/components/compare/CompareSuggestionCard";
+import ComparisonTimeline from "@/components/ComparisonTimeline";
+import ImpactAnalogy from "@/components/ImpactAnalogy";
 import { getT } from "@/lib/i18n/server";
 
 function first(v: string | string[] | undefined): string | undefined {
@@ -71,7 +74,16 @@ export default async function ComparePage(props: PageProps<"/compare">) {
         {products.length === 1 && ` — ${t("compare.addOnePrompt")}`}
       </p>
 
+      {products.length >= 2 && (
+        <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_320px]">
+          <GreenScoreLine a={products[0]} b={products[1]} />
+          <ImpactAnalogy analogy={analogyBetweenProducts(products[0], products[1])} />
+        </div>
+      )}
+
       <CompareTable products={products} groups={groups} />
+
+      <ComparisonTimeline products={products.slice(0, 2)} />
 
       {/* Add-to-compare suggestions */}
       {suggestions.length > 0 && (
@@ -85,5 +97,37 @@ export default async function ComparePage(props: PageProps<"/compare">) {
         </section>
       )}
     </div>
+  );
+}
+
+function GreenScoreLine({
+  a,
+  b,
+}: {
+  a: { name: string; sustainabilityScore: number };
+  b: { name: string; sustainabilityScore: number };
+}) {
+  const better = a.sustainabilityScore >= b.sustainabilityScore ? a : b;
+  return (
+    <section className="rounded-xl border border-bol-green/30 bg-white p-5">
+      <p className="text-sm font-bold text-bol-green">Sustainability difference</p>
+      <div className="mt-4 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+        <div className="max-w-40 text-sm font-bold text-bol-ink">
+          <p className="line-clamp-2">{a.name}</p>
+          <p className="text-bol-green">{a.sustainabilityScore}</p>
+        </div>
+        <div className="relative h-3 rounded-full bg-zinc-100">
+          <div className="absolute inset-y-0 left-0 rounded-full bg-bol-green/25" style={{ width: `${a.sustainabilityScore}%` }} />
+          <div className="absolute inset-y-0 left-0 rounded-full bg-bol-green" style={{ width: `${b.sustainabilityScore}%` }} />
+        </div>
+        <div className="max-w-40 text-right text-sm font-bold text-bol-ink">
+          <p className="line-clamp-2">{b.name}</p>
+          <p className="text-bol-green">{b.sustainabilityScore}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-sm text-zinc-700">
+        {better.name} is highlighted as the more sustainable option in this comparison.
+      </p>
+    </section>
   );
 }

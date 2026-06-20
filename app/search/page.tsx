@@ -4,8 +4,11 @@ import ProductListRow from "@/components/ProductListRow";
 import FilterSidebar from "@/components/search/FilterSidebar";
 import SortSelect from "@/components/search/SortSelect";
 import Pagination from "@/components/search/Pagination";
+import FiltersBar from "@/components/FiltersBar";
+import ProductRail from "@/components/ProductRail";
 import { getT } from "@/lib/i18n/server";
 import { translate, type Lang } from "@/lib/i18n/translate";
+import type { SustainabilityGrade } from "@/lib/scoring";
 
 const PAGE_SIZE = 24;
 
@@ -26,6 +29,10 @@ export default async function SearchPage(props: PageProps<"/search">) {
   const page = Number(first(sp.page) ?? "1") || 1;
   const minPrice = first(sp.minPrice) ? Number(first(sp.minPrice)) : undefined;
   const maxPrice = first(sp.maxPrice) ? Number(first(sp.maxPrice)) : undefined;
+  const minScore = first(sp.minScore) ? Number(first(sp.minScore)) : undefined;
+  const minLifespan = first(sp.minLifespan) ? Number(first(sp.minLifespan)) : undefined;
+  const grade = first(sp.grade) as SustainabilityGrade | undefined;
+  const valuePerYear = first(sp.valuePerYear) === "best" ? "best" : undefined;
   const carbonNeutral = first(sp.carbonNeutral) === "true" ? true : undefined;
   const sameDay = first(sp.sameDay) === "true" ? true : undefined;
 
@@ -40,9 +47,19 @@ export default async function SearchPage(props: PageProps<"/search">) {
     pageSize: PAGE_SIZE,
     minPrice,
     maxPrice,
+    minScore,
+    minLifespan,
+    grade,
+    valuePerYear,
     carbonNeutral,
     sameDay,
   });
+  const sustainablePopular = searchProducts({
+    category,
+    minScore: 75,
+    sort: "combined",
+    pageSize: 6,
+  }).items;
 
   // params for pagination links (everything except `page`)
   const baseParams = new URLSearchParams();
@@ -85,6 +102,18 @@ export default async function SearchPage(props: PageProps<"/search">) {
             </div>
             <SortSelect current={sort} />
           </div>
+
+          <FiltersBar />
+
+          {sustainablePopular.length > 0 && (
+            <div className="mb-5 rounded-xl border border-bol-green/30 bg-bol-green/5 px-4">
+              <ProductRail
+                title="Most Sustainable Popular Products"
+                products={sustainablePopular}
+                seeAllHref="/search?minScore=75&sort=combined"
+              />
+            </div>
+          )}
 
           {result.items.length === 0 ? (
             <EmptyState query={q} lang={lang} />

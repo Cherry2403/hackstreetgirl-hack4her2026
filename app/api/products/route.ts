@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { searchProducts, type ProductQuery, type SortKey } from "@/lib/products";
+import type { SustainabilityGrade } from "@/lib/scoring";
 
 const VALID_SORTS: SortKey[] = [
   "relevance",
@@ -7,6 +8,9 @@ const VALID_SORTS: SortKey[] = [
   "price-desc",
   "rating",
   "sustainability",
+  "lifespan",
+  "value",
+  "combined",
   "popular",
 ];
 
@@ -30,6 +34,10 @@ export async function GET(request: NextRequest) {
     sameDay: sp.get("sameDay") === "true" ? true : undefined,
     minPrice: numParam(sp.get("minPrice")),
     maxPrice: numParam(sp.get("maxPrice")),
+    grade: (sp.get("grade") || undefined) as SustainabilityGrade | undefined,
+    minScore: numParam(sp.get("minScore")),
+    minLifespan: numParam(sp.get("minLifespan")),
+    valuePerYear: sp.get("valuePerYear") === "best" ? "best" : undefined,
     sort: sortRaw && VALID_SORTS.includes(sortRaw) ? sortRaw : undefined,
     page: numParam(sp.get("page")),
     pageSize: numParam(sp.get("pageSize")),

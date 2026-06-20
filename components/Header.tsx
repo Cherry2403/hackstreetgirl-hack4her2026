@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
@@ -22,15 +21,12 @@ export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
-  const [q, setQ] = useState("");
-
-  // keep the input in sync with the URL when on the search page
-  useEffect(() => {
-    setQ(searchParams.get("q") ?? "");
-  }, [searchParams]);
+  const currentQuery = searchParams.get("q") ?? "";
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement;
+    const q = String(new FormData(form).get("q") ?? "");
     const params = new URLSearchParams();
     if (q.trim()) params.set("q", q.trim());
     router.push(`/search?${params.toString()}`);
@@ -72,9 +68,10 @@ export default function Header() {
           {/* Search (pill, white background) */}
           <form onSubmit={onSubmit} className="relative flex flex-1">
             <input
+              key={currentQuery}
+              name="q"
               type="search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              defaultValue={currentQuery}
               placeholder={t("header.searchPlaceholder")}
               className="w-full rounded-full border-0 bg-white py-2.5 pl-5 pr-14 text-bol-ink outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-bol-yellow"
               aria-label={t("header.search")}

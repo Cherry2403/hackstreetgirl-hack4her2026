@@ -30,6 +30,7 @@ export default function CompareTable({
 
   const cols = products.length;
   const gridCols = `minmax(140px,1fr) repeat(${cols}, minmax(0,1fr))`;
+  const topScore = Math.max(...products.map((p) => p.sustainabilityScore));
 
   const isDiff = (row: CompareRow) =>
     new Set(row.values).size > 1;
@@ -76,6 +77,25 @@ export default function CompareTable({
               </div>
               <div className="mt-1">
                 <Price amount={p.price} size="md" className="text-[#e2240f]" />
+              </div>
+              <div className="mt-2 rounded-lg bg-bol-green/10 p-2">
+                <div className="flex items-center justify-between text-xs font-bold text-bol-green">
+                  <span>Sustainability</span>
+                  <span>{p.sustainabilityScore}/100</span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-white">
+                  <div
+                    className={`h-full rounded-full ${
+                      p.sustainabilityScore === topScore ? "bg-bol-green" : "bg-bol-green/45"
+                    }`}
+                    style={{ width: `${p.sustainabilityScore}%` }}
+                  />
+                </div>
+                {p.sustainabilityScore === topScore && (
+                  <p className="mt-1 text-[11px] font-bold text-bol-green">
+                    More sustainable option
+                  </p>
+                )}
               </div>
               <Link
                 href={`/product/${p.id}`}
