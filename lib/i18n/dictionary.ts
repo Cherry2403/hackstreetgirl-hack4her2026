@@ -259,6 +259,18 @@ export const dictionary = {
     nl: "voeg er hieronder één toe om te vergelijken.",
     en: "add one below to compare.",
   },
+  "compare.valueTitle": { nl: "Prijs per levensjaar", en: "Price per year of use" },
+  "compare.valueSubtitle": {
+    nl: "Lagere kosten per verwacht levensjaar betekenen betere langetermijnwaarde.",
+    en: "Lower cost per expected year of use means better long-term value.",
+  },
+  "compare.bestValue": { nl: "Beste waarde", en: "Best value" },
+  "compare.valueUnavailable": {
+    nl: "Levensduur ontbreekt, dus waarde per jaar is onbekend.",
+    en: "Lifespan is missing, so value per year is unknown.",
+  },
+  "compare.priceLabel": { nl: "Prijs", en: "Price" },
+  "compare.lifespanLabel": { nl: "Levensduur", en: "Lifespan" },
 
   // ---- Spec groups ----
   "spec.general": { nl: "Algemeen", en: "General" },
@@ -294,6 +306,10 @@ export const dictionary = {
   "spec.gln": { nl: "GLN", en: "GLN" },
   "spec.priceFrom": { nl: "Prijs vanaf", en: "Price from" },
   "spec.priceTo": { nl: "Prijs tot", en: "Price to" },
+  "spec.pricePerLifeYear": {
+    nl: "Prijs per levensjaar",
+    en: "Price per year of use",
+  },
   "spec.soldIn2025": { nl: "Verkocht in 2025", en: "Sold in 2025" },
 
   // ---- Footer ----

@@ -87,6 +87,13 @@ export function buildSpecGroups(p: Product, lang: Lang = "nl"): SpecGroup[] {
           value: `€ ${p.priceTo.toFixed(2).replace(".", ",")}`,
         },
         {
+          label: t("spec.pricePerLifeYear"),
+          value:
+            p.valuePerYear != null
+              ? `€ ${p.valuePerYear.toFixed(2).replace(".", ",")} / ${t("spec.year")}`
+              : dash,
+        },
+        {
           label: t("spec.soldIn2025"),
           value: p.unitsSold.toLocaleString(localeStr),
         },

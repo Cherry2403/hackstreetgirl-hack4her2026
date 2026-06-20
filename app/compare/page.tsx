@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { getProductsByIds, getRelatedProducts } from "@/lib/products";
+import { getProductsByIds, getRelatedProducts, type Product } from "@/lib/products";
 import { analogyBetweenProducts } from "@/lib/analogy";
 import { buildSpecGroups, buildSpecMap } from "@/lib/specs";
 import CompareTable from "@/components/compare/CompareTable";
 import CompareSuggestionCard from "@/components/compare/CompareSuggestionCard";
 import ComparisonTimeline from "@/components/ComparisonTimeline";
 import ImpactAnalogy from "@/components/ImpactAnalogy";
+import { euroString } from "@/lib/format";
 import { getT } from "@/lib/i18n/server";
+import type { TranslationKey } from "@/lib/i18n/translate";
 
 function first(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
@@ -81,6 +83,8 @@ export default async function ComparePage(props: PageProps<"/compare">) {
         </div>
       )}
 
+      <PriceLifespanValue products={products} t={t} />
+
       <CompareTable products={products} groups={groups} />
 
       <ComparisonTimeline products={products.slice(0, 2)} />
@@ -97,6 +101,94 @@ export default async function ComparePage(props: PageProps<"/compare">) {
         </section>
       )}
     </div>
+  );
+}
+
+function PriceLifespanValue({
+  products,
+  t,
+}: {
+  products: Product[];
+  t: (key: TranslationKey) => string;
+}) {
+  const values = products
+    .map((product) => product.valuePerYear)
+    .filter((value): value is number => value != null);
+  const bestValue = values.length ? Math.min(...values) : null;
+  const worstValue = values.length ? Math.max(...values) : null;
+
+  return (
+    <section className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-bol-ink">{t("compare.valueTitle")}</h2>
+          <p className="mt-1 text-sm text-zinc-600">{t("compare.valueSubtitle")}</p>
+        </div>
+        <p className="text-xs font-medium text-zinc-500">{t("spec.pricePerLifeYear")}</p>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {products.map((product) => {
+          const value = product.valuePerYear;
+          const isBest = value != null && value === bestValue;
+          const range = bestValue != null && worstValue != null ? worstValue - bestValue : 0;
+          const score =
+            value == null
+              ? 0
+              : range === 0
+                ? 100
+                : 35 + ((worstValue! - value) / range) * 65;
+
+          return (
+            <article
+              key={product.id}
+              className={`rounded-lg border p-4 ${
+                isBest ? "border-bol-green bg-bol-green/5" : "border-zinc-200 bg-zinc-50"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="line-clamp-2 text-sm font-bold text-bol-ink">{product.name}</h3>
+                {isBest && (
+                  <span className="shrink-0 rounded-full bg-bol-green px-2 py-1 text-[11px] font-bold text-white">
+                    {t("compare.bestValue")}
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-4 text-2xl font-black text-[#e2240f]">
+                {value != null ? `${euroString(value)} / ${t("spec.year")}` : "–"}
+              </p>
+
+              <div className="mt-3 h-2 rounded-full bg-white">
+                <div
+                  className={`h-2 rounded-full ${isBest ? "bg-bol-green" : "bg-bol-blue"}`}
+                  style={{ width: `${score}%` }}
+                />
+              </div>
+
+              <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <dt className="text-zinc-500">{t("compare.priceLabel")}</dt>
+                  <dd className="font-bold text-bol-ink">{euroString(product.price)}</dd>
+                </div>
+                <div>
+                  <dt className="text-zinc-500">{t("compare.lifespanLabel")}</dt>
+                  <dd className="font-bold text-bol-ink">
+                    {product.lifespanYears != null
+                      ? `${product.lifespanYears} ${t("spec.year")}`
+                      : "–"}
+                  </dd>
+                </div>
+              </dl>
+
+              {value == null && (
+                <p className="mt-3 text-xs text-zinc-500">{t("compare.valueUnavailable")}</p>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
