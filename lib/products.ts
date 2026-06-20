@@ -428,23 +428,39 @@ function sortProducts(items: Product[], sort: SortKey, q?: ProductQuery): Produc
       return arr.sort((a, b) => b.unitsSold - a.unitsSold);
     case "relevance":
     default: {
-      // crude relevance: name-start matches first, then popularity
+      // Crude relevance: name-start matches first, then local origin, then popularity.
       const needle = q?.q?.toLowerCase();
-      if (!needle) return arr.sort((a, b) => b.unitsSold - a.unitsSold);
+      if (!needle) {
+        return arr.sort(
+          (a, b) => localProductScore(b) - localProductScore(a) || b.unitsSold - a.unitsSold,
+        );
+      }
       return arr.sort((a, b) => {
         const as = a.name.toLowerCase().startsWith(needle) ? 1 : 0;
         const bs = b.name.toLowerCase().startsWith(needle) ? 1 : 0;
         if (as !== bs) return bs - as;
+        const localDiff = localProductScore(b) - localProductScore(a);
+        if (localDiff !== 0) return localDiff;
         return b.unitsSold - a.unitsSold;
       });
     }
   }
 }
 
+function localProductScore(p: Product): number {
+  return p.countryOfOrigin.toLowerCase() === "netherlands" ? 1 : 0;
+}
+
 function combinedScore(p: Product): number {
   const delivery = p.normalDelivery ? 100 : p.nextDay ? 75 : p.sameDay ? 55 : 65;
   const value = p.valuePerYear == null ? 50 : Math.max(0, 100 - p.valuePerYear);
-  return p.sustainabilityScore * 0.55 + delivery * 0.15 + value * 0.2 + p.rating * 2;
+  return (
+    p.sustainabilityScore * 0.55 +
+    delivery * 0.15 +
+    value * 0.2 +
+    localProductScore(p) * 8 +
+    p.rating * 2
+  );
 }
 
 export function getGreenerAlternatives(product: Product, limit = 4): Product[] {

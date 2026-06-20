@@ -22,6 +22,7 @@ export default async function ProductListRow({ product }: { product: Product }) 
     : product.nextDay
       ? t("buy.deliveryTomorrow")
       : t("buy.deliveryStandard");
+  const isLocalProduct = product.countryOfOrigin.toLowerCase() === "netherlands";
 
   return (
     <article className="grid grid-cols-1 gap-4 border-b border-bol-border py-6 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_220px]">
@@ -45,7 +46,17 @@ export default async function ProductListRow({ product }: { product: Product }) 
 
       {/* Middle: info */}
       <div className="min-w-0">
-        {isGoodChoice(product) && <GoodChoiceBadge className="mb-2" />}
+        {(isGoodChoice(product) || isLocalProduct) && (
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            {isGoodChoice(product) && <GoodChoiceBadge />}
+            {isLocalProduct && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-700 ring-1 ring-orange-200">
+                <span aria-hidden="true">🇳🇱</span>
+                {t("badge.localProduct")}
+              </span>
+            )}
+          </div>
+        )}
         <p className="text-sm text-zinc-500">{product.brand}</p>
         <h2 className="mt-0.5">
           <Link

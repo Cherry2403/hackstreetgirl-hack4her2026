@@ -47,6 +47,7 @@ export const dictionary = {
   "card.inStock": { nl: "Op voorraad", en: "In stock" },
   "card.sponsored": { nl: "Gesponsord", en: "Sponsored" },
   "badge.goodChoice": { nl: "Goede keuze", en: "Good Choice" },
+  "badge.localProduct": { nl: "Lokaal product", en: "Local product" },
   "badge.carbonNeutral": { nl: "CO₂-neutraal", en: "Carbon neutral" },
   "badge.recyclable": { nl: "recyclebaar", en: "recyclable" },
   "badge.biodegradable": { nl: "Biologisch afbreekbaar", en: "Biodegradable" },
