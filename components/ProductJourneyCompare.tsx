@@ -76,7 +76,9 @@ export default function ProductJourneyCompare({
             <div className="flex items-center gap-2">
               <span
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                  activeStep === item.id ? "bg-white text-bol-blue" : STEP_STYLES[item.id]
+                  activeStep === item.id
+                    ? "bg-white text-bol-blue"
+                    : STEP_STYLES[item.id]
                 }`}
               >
                 <StepIcon step={item.id} className="h-5 w-5" />
@@ -94,24 +96,6 @@ export default function ProductJourneyCompare({
             </div>
           </button>
         ))}
-      </div>
-
-      <div className="mt-4 rounded-xl border border-bol-border bg-bol-gray/60 p-4">
-        <div className="flex items-center gap-3">
-          <span
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
-              STEP_STYLES[step.id]
-            }`}
-          >
-            <StepIcon step={step.id} className="h-6 w-6" />
-          </span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-              {step.era}
-            </p>
-            <h3 className="text-lg font-black text-bol-ink">{step.shopperQuestion}</h3>
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 overflow-x-auto">
@@ -187,10 +171,9 @@ function journeyRows(products: Product[], step: JourneyStepId): JourneyRow[] {
 
   if (step === "delivery") {
     return compactRows([
-      ["Warehouse", products.map((p) => p.warehouseName || "–")],
-      ["Standard", products.map((p) => (p.normalDelivery ? "Available" : "–"))],
-      ["Next day", products.map((p) => (p.nextDay ? "Available" : "–"))],
-      ["Same day", products.map((p) => (p.sameDay ? "Available" : "–"))],
+      ["Standard", products.map((p) => availabilityMark(p.normalDelivery))],
+      ["Next day", products.map((p) => availabilityMark(p.nextDay))],
+      ["Same day", products.map((p) => availabilityMark(p.sameDay))],
     ]);
   }
 
@@ -210,6 +193,10 @@ function journeyRows(products: Product[], step: JourneyStepId): JourneyRow[] {
 
 function compactRows(rows: Array<[string, string[]]>): JourneyRow[] {
   return rows.map(([label, values]) => ({ label, values })).filter((row) => row.values.some((value) => value !== "–"));
+}
+
+function availabilityMark(isAvailable: boolean): string {
+  return isAvailable ? "✓" : "×";
 }
 
 function originLabel(label: string): string | null {
