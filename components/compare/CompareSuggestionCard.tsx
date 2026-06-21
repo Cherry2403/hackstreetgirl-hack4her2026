@@ -6,10 +6,10 @@ import StarRating from "@/components/StarRating";
 import { getT } from "@/lib/i18n/server";
 
 /**
- * A product card on the compare page whose whole surface adds the product to
- * the comparison (links to `addHref`). Distinct from `ProductCard`, which links
- * to the product detail page — nesting those two would create invalid nested
- * <a> elements.
+ * A compare-page suggestion card. Mirrors the product-header card in
+ * CompareTable, but its whole surface adds the product to the comparison
+ * (links to `addHref`) instead of opening the product — so we don't nest a
+ * product <Link> inside another <Link>.
  */
 export default async function CompareSuggestionCard({
   product,
@@ -20,42 +20,30 @@ export default async function CompareSuggestionCard({
 }) {
   const { t } = await getT();
   return (
-    <Link
-      href={addHref}
-      className="group flex flex-col rounded-lg border border-bol-border bg-white p-3 transition-shadow hover:shadow-md"
-    >
-      <div className="mb-2 aspect-square overflow-hidden rounded">
+    <div className="flex flex-col">
+      <div className="mb-2 aspect-square overflow-hidden rounded border border-bol-border bg-bol-gray">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={productImage(product.id, product.name)}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]"
+          className="h-full w-full object-cover"
         />
       </div>
-
-      <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-tight text-bol-ink">
+      <p className="line-clamp-2 text-sm font-medium text-bol-ink">
         {product.name}
-      </h3>
-
+      </p>
       <div className="mt-1">
         <StarRating rating={product.rating} count={product.reviewCount} />
       </div>
-
-      <div className="mt-auto pt-2">
-        <Price amount={product.price} size="md" />
-        <span className="mt-2 flex items-center justify-center gap-1 rounded-full border border-bol-blue py-1.5 text-xs font-bold text-bol-blue group-hover:bg-bol-blue group-hover:text-white">
-          <PlusIcon className="h-4 w-4" />
-          {t("compare.add")}
-        </span>
+      <div className="mt-1">
+        <Price amount={product.price} size="md" className="text-[#e2240f]" />
       </div>
-    </Link>
-  );
-}
-
-function PlusIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className={className}>
-      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-    </svg>
+      <Link
+        href={addHref}
+        className="mt-2 rounded-full border border-bol-blue px-3 py-1.5 text-center text-xs font-bold text-bol-blue hover:bg-bol-blue hover:text-white"
+      >
+        + {t("compare.add")}
+      </Link>
+    </div>
   );
 }

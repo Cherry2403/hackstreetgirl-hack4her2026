@@ -53,6 +53,14 @@ export interface Product {
   sustainability: SustainabilityScoreResult;
   isSustainable: boolean;
   valuePerYear: number | null;
+  /** Per-product lifecycle for the Time Machine (parsed from the CSV column). */
+  lifecycle: LifecycleStage[];
+}
+
+/** One stage of a product's lifecycle (factory → afterlife). Titles only. */
+export interface LifecycleStage {
+  label: string;
+  title: string;
 }
 
 export interface ProductQuery {
@@ -163,6 +171,21 @@ function parseCsv(text: string): Record<string, string>[] {
     });
     return obj;
   });
+}
+
+/**
+ * Parse the CSV `Lifecycle_Stages` cell into ordered stages.
+ * Format: "Label::Title|Label::Title|..." (pipe-separated, "::" splits label/title).
+ */
+function parseLifecycle(raw: string | undefined): LifecycleStage[] {
+  if (!raw) return [];
+  return raw
+    .split("|")
+    .map((chunk) => {
+      const [label, ...rest] = chunk.split("::");
+      return { label: label.trim(), title: rest.join("::").trim() };
+    })
+    .filter((s) => s.label && s.title);
 }
 
 // ---------------------------------------------------------------------------
@@ -298,6 +321,7 @@ export function getAllProducts(): Product[] {
           lifespanYears != null && lifespanYears > 0
             ? Math.round((priceFrom / lifespanYears) * 100) / 100
             : null,
+        lifecycle: parseLifecycle(r["Lifecycle_Stages"]),
       };
     });
 

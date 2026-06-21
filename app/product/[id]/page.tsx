@@ -10,7 +10,6 @@ import { buildSpecGroups } from "@/lib/specs";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
 import SpecTable from "@/components/product/SpecTable";
-import SustainabilityPanel from "@/components/product/SustainabilityPanel";
 import Reviews from "@/components/product/Reviews";
 import ProductRail from "@/components/ProductRail";
 import StarRating from "@/components/StarRating";
@@ -114,11 +113,6 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
         <div className="lg:row-span-2">
           <BuyBox product={product} analogy={analogy} />
         </div>
-      </div>
-
-      {/* Sustainability panel */}
-      <div className="mt-8">
-        <SustainabilityPanel product={product} />
       </div>
 
       <AlternativeProducts product={product} />

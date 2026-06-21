@@ -17,6 +17,20 @@ export function euroString(amount: number): string {
   return `€ ${whole},${fraction}`;
 }
 
+/**
+ * Map an eco-label name to its stamp image in /public/eco-labels.
+ * Returns null when there is no label (so callers can skip the stamp).
+ * Replace the placeholder PNGs in public/eco-labels/ with real artwork later.
+ */
+export function ecoLabelImage(label: string): string | null {
+  const key = label.trim().toLowerCase();
+  if (!key) return null;
+  const slug = key
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `/eco-labels/${slug}.png`;
+}
+
 const PLACEHOLDER_COLORS = [
   ["#dbeafe", "#3b82f6"],
   ["#dcfce7", "#22c55e"],
