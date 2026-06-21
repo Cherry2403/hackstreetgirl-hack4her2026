@@ -14,8 +14,6 @@ function round(value: number, digits = 1): number {
 export function analogyFromCo2Delta(deltaKg: number): ImpactAnalogy {
   const abs = Math.abs(deltaKg);
   const drivingKm = round(abs / 0.17);
-  const phoneMonths = round(abs / 0.0018 / 30);
-  const coffeeCups = Math.round(abs / 0.28);
 
   if (abs < 0.5) {
     return {
@@ -25,25 +23,9 @@ export function analogyFromCo2Delta(deltaKg: number): ImpactAnalogy {
     };
   }
 
-  if (drivingKm >= 8) {
-    return {
-      title: "Driving comparison",
-      text: `The CO2 difference is roughly equivalent to ${drivingKm} km of average car driving.`,
-      deltaKg,
-    };
-  }
-
-  if (phoneMonths >= 1) {
-    return {
-      title: "Phone charging comparison",
-      text: `The CO2 difference is similar to about ${phoneMonths} months of charging a phone.`,
-      deltaKg,
-    };
-  }
-
   return {
-    title: "Coffee comparison",
-    text: `The CO2 difference is roughly equivalent to ${coffeeCups} cups of coffee.`,
+    title: "Driving comparison",
+    text: `The CO2 difference is roughly equivalent to ${drivingKm} km of average car driving.`,
     deltaKg,
   };
 }

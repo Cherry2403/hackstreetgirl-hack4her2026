@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "@/components/cart/CartContext";
 
 /** Compact yellow "add to cart" button used on result rows. */
 export default function AddToCartButton({
+  product,
   label = "In winkelwagen",
   addedLabel = "✓ Toegevoegd",
   full = false,
 }: {
+  product: { id: string; name: string; price: number };
   label?: string;
   addedLabel?: string;
   full?: boolean;
 }) {
+  const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
 
   return (
@@ -19,6 +23,7 @@ export default function AddToCartButton({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        addToCart(product);
         setAdded(true);
         setTimeout(() => setAdded(false), 1500);
       }}

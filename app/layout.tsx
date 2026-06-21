@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CompareProvider } from "@/components/compare/CompareContext";
+import { CartProvider } from "@/components/cart/CartContext";
 import CompareTray from "@/components/compare/CompareTray";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { AnimalProvider } from "@/components/animals/AnimalContext";
@@ -36,7 +37,8 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col bg-bol-gray">
         <LanguageProvider lang={lang}>
           <AnimalProvider>
-            <CompareProvider>
+            <CartProvider>
+          <CompareProvider>
               <Suspense fallback={<div className="h-[124px] bg-bol-blue" />}>
                 <Header />
               </Suspense>
@@ -44,6 +46,7 @@ export default async function RootLayout({
               <Footer />
               <CompareTray />
             </CompareProvider>
+          </CartProvider>
           </AnimalProvider>
         </LanguageProvider>
       </body>
