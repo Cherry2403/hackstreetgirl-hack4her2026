@@ -43,12 +43,6 @@ export default function CompareProductCard({ product }: { product: Product }) {
         >
           View product
         </Link>
-        <a
-          href="#product-journeys"
-          className="rounded-full border border-bol-border bg-white px-4 py-2 text-xs font-bold text-bol-blue hover:border-bol-blue"
-        >
-          See product journey
-        </a>
       </div>
     </article>
   );
