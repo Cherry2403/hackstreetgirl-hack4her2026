@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import HeaderAnimal from "@/components/animals/HeaderAnimal";
 
 const CATEGORIES = [
   "Fitness",
@@ -53,15 +54,17 @@ export default function Header() {
       </div>
 
       {/* Main blue bar */}
-      <div className="bg-bol-blue text-white">
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
+      <div className="relative overflow-hidden bg-bol-blue text-white">
+        {/* Collectible animal walks here — below logo/search (z-0), above the blue bg */}
+        <HeaderAnimal />
+        <div className="relative z-10 mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
           {/* Logo (white via CSS filter) */}
           <Link href="/" aria-label="bol home" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt="bol"
-              className="h-8 w-auto brightness-0 invert"
+              className="h-13 w-auto brightness-0 invert"
             />
           </Link>
 
@@ -87,14 +90,29 @@ export default function Header() {
 
           {/* Account / wishlist / cart */}
           <nav className="flex items-center gap-5 text-sm">
-            <Link href="/" className="hidden items-center gap-1 hover:underline sm:flex">
-              {t("header.login")}
+            <Link
+              href="/account"
+              className="flex items-center gap-2 hover:opacity-90"
+              aria-label="Account"
+            >
+              <span className="hidden text-right leading-tight sm:block">
+                <span className="block text-xs font-normal">{t("header.welcome")}</span>
+                <span className="block font-bold">Customer_Name</span>
+              </span>
+              <UserIcon className="h-6 w-6" />
             </Link>
             <Link href="/" aria-label={t("header.wishlist")} className="hover:opacity-80">
               <HeartIcon className="h-6 w-6" />
             </Link>
-            <Link href="/" aria-label={t("header.cart")} className="hover:opacity-80">
+            <Link
+              href="/cart"
+              aria-label={t("header.cart")}
+              className="relative hover:opacity-80"
+            >
               <CartIcon className="h-6 w-6" />
+              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-bol-yellow px-1 text-xs font-bold text-bol-ink">
+                1
+              </span>
             </Link>
           </nav>
         </div>
@@ -126,6 +144,14 @@ function SearchIcon({ className = "" }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className={className}>
       <circle cx="11" cy="11" r="7" />
       <path d="m21 21-4.3-4.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+function UserIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={className}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" strokeLinecap="round" />
     </svg>
   );
 }

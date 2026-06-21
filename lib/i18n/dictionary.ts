@@ -20,10 +20,55 @@ export const dictionary = {
   },
   "header.search": { nl: "Zoeken", en: "Search" },
   "header.login": { nl: "Inloggen", en: "Login" },
+  "header.welcome": { nl: "Welkom", en: "Welcome" },
   "header.wishlist": { nl: "Verlanglijst", en: "Wishlist" },
   "header.cart": { nl: "Winkelwagen", en: "Cart" },
   "header.allCategories": { nl: "Alle categorieën", en: "All categories" },
   "common.free": { nl: "Gratis", en: "Free" },
+
+  // ---- Account / My sphere page ----
+  "account.mySphere": { nl: "Mijn overzicht", en: "My sphere" },
+  "account.orders": { nl: "Bestellingen", en: "Orders" },
+  "account.payInvoices": { nl: "Facturen betalen", en: "Pay invoices" },
+  "account.returns": { nl: "Retourneren", en: "Returns" },
+  "account.conversations": { nl: "Gesprekken", en: "Conversations" },
+  "account.dataPreferences": { nl: "Gegevens & voorkeuren", en: "Data & Preferences" },
+  "account.giftVouchers": { nl: "Cadeaubonnen", en: "Gift vouchers" },
+  "account.selectKobo": { nl: "Mijn Select & Kobo Plus", en: "My Select & Kobo Plus" },
+  "account.digitalProducts": { nl: "Digitale producten", en: "Digital products" },
+  "account.sell": { nl: "Verkopen", en: "Sell" },
+  "account.logout": { nl: "Uitloggen", en: "Log out" },
+  "account.helloName": { nl: "Hallo {name}", en: "Hello {name}" },
+  "account.heroSub": {
+    nl: "Hier vind je je bestellingen, facturen, retouren en meer.",
+    en: "Here you will find your orders, invoices, returns and more.",
+  },
+  "account.lastOrder": { nl: "Je laatste bestelling", en: "Your last order" },
+  "account.noOrders": {
+    nl: "Er zijn geen recente bestellingen gevonden. Het kan 3 minuten duren voordat je bestellingen hier zichtbaar zijn.",
+    en: "No recent orders were found. It may take 3 minutes for your orders to be visible here.",
+  },
+  "account.viewAllOrders": { nl: "Bekijk al je bestellingen", en: "View all your orders" },
+  "account.invoices": { nl: "Facturen", en: "Invoices" },
+  "account.noInvoices": { nl: "Je hebt nog geen facturen", en: "You don't have any invoices yet" },
+  "account.toOverview": { nl: "Naar je overzicht", en: "To your overview" },
+  "account.thisIsYou": { nl: "Dit ben jij", en: "This is you" },
+  "account.customerNumber": { nl: "Klantnummer", en: "Customer number" },
+  "account.gotBon": { nl: "Bon ontvangen?", en: "Got bon?" },
+  "account.gotBonText": {
+    nl: "Controleer de waarde en voeg het saldo toe aan je account.",
+    en: "Check the value and add the balance to your account.",
+  },
+
+  // ---- Animal collection ----
+  "animals.title": { nl: "Mijn dierencollectie", en: "My animal friends" },
+  "animals.subtitle": {
+    nl: "Verdiend met duurzame aankopen. Kies er één om in de header te laten lopen.",
+    en: "Earned with sustainable purchases. Pick one to display in the header.",
+  },
+  "animals.remaining": { nl: "over in het wild", en: "left in the wild" },
+  "animals.displaying": { nl: "Wordt getoond", en: "Displaying" },
+  "animals.display": { nl: "Toon in header", en: "Show in header" },
 
   // ---- Home ----
   "home.badge": { nl: "Nieuw: duurzaamheidsscores", en: "New: sustainability scores" },
@@ -347,6 +392,42 @@ export const dictionary = {
   "lang.label": { nl: "Taal", en: "Language" },
   "lang.dutch": { nl: "Nederlands", en: "Dutch" },
   "lang.english": { nl: "Engels", en: "English" },
+
+  // ---- Cart page ----
+  "cart.title": { nl: "Winkelwagen", en: "Shopping cart" },
+  "cart.overview": { nl: "Overzicht", en: "Overview" },
+  "cart.totalItems": { nl: "Totaal artikelen", en: "Total items" },
+  "cart.shippingCosts": { nl: "Verzendkosten", en: "Shipping costs" },
+  "cart.giftCard": { nl: "Heb je een cadeaubon? Voeg deze toe in de volgende stap.", en: "Do you have a gift card? Add it in the next step." },
+  "cart.stillToPay": { nl: "Nog te betalen", en: "Still to be paid" },
+  "cart.toCheckout": { nl: "Doorgaan naar bestellen", en: "Continue to order" },
+  "cart.continueShopping": { nl: "← Verder winkelen", en: "← Continue shopping" },
+  "cart.salesBy": { nl: "Verkoop door", en: "Sales by" },
+  "cart.qty": { nl: "Aantal", en: "Qty" },
+  "cart.deliveredBy": { nl: "Geleverd uiterlijk", en: "Delivered no later than" },
+  "cart.discount": { nl: "korting", en: "discount" },
+  "cart.mostly": { nl: "Meestal", en: "Mostly" },
+
+  // ---- Checkout / payment page ----
+  "checkout.title": { nl: "Betalen", en: "Payment" },
+  "checkout.orderSummary": { nl: "Jouw bestelling", en: "Your order" },
+  "checkout.pay": { nl: "Betalen", en: "Pay" },
+  "checkout.payMethod": { nl: "Betaalmethode", en: "Payment method" },
+  "checkout.ideal": { nl: "iDEAL", en: "iDEAL" },
+  "checkout.creditCard": { nl: "Creditcard", en: "Credit card" },
+  "checkout.paypal": { nl: "PayPal", en: "PayPal" },
+  "checkout.processing": { nl: "Bezig met betalen…", en: "Processing payment…" },
+  "checkout.deliverTo": { nl: "Bezorgen op", en: "Deliver to" },
+  "checkout.address": { nl: "Keizersgracht 123, 1015 CJ Amsterdam", en: "Keizersgracht 123, 1015 CJ Amsterdam" },
+  "checkout.securePayment": { nl: "Veilig betalen", en: "Secure payment" },
+
+  // ---- Animal unlock modal ----
+  "unlock.tap": { nl: "Tik om te onthullen!", en: "Tap to reveal!" },
+  "unlock.new": { nl: "Nieuw dier verdiend!", en: "Your new animal friend!" },
+  "unlock.inTheWild": { nl: "nog in het wild", en: "left in the wild" },
+  "unlock.funFacts": { nl: "Weetjes", en: "Fun facts" },
+  "unlock.display": { nl: "Bekijk al mijn diervrienden", en: "See all my animal friends" },
+  "unlock.close": { nl: "Sluiten", en: "Close" },
 
   // ---- 404 ----
   "notFound.title": { nl: "Pagina niet gevonden", en: "Page not found" },
