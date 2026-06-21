@@ -340,12 +340,8 @@ export function getProductById(id: string): Product | undefined {
 export function productSpecLine(p: Product, lang: Lang = "nl"): string {
   const tr = (k: TranslationKey) => translate(lang, k);
   const parts: string[] = [p.subcategory];
-  if (p.countryOfOrigin) parts.push(`${tr("row.origin")}: ${p.countryOfOrigin}`);
-  if (p.lifespanYears != null)
-    parts.push(`${tr("row.lifespan")}: ${p.lifespanYears} ${tr("row.lifespanUnit")}`);
-  if (p.repairability != null)
-    parts.push(`${tr("row.repairable")}: ${p.repairability}${p.repairability <= 5 ? "/5" : "/10"}`);
-  if (p.co2Kg != null) parts.push(`CO₂: ${p.co2Kg} kg`);
+  if (p.countryOfOrigin)
+    parts.push(`${tr("row.origin")}: ${p.countryOfOrigin}`);
   return parts.filter(Boolean).join(" • ");
 }
 
