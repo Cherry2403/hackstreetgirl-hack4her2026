@@ -3,7 +3,6 @@ import { getProductsByIds, getRelatedProducts } from "@/lib/products";
 import CompareSuggestionCard from "@/components/compare/CompareSuggestionCard";
 import CompareProductCard from "@/components/CompareProductCard";
 import ComparisonTable from "@/components/ComparisonTable";
-import ProductJourneyCompare from "@/components/ProductJourneyCompare";
 import { getT } from "@/lib/i18n/server";
 
 function first(v: string | string[] | undefined): string | undefined {
@@ -71,8 +70,6 @@ export default async function ComparePage(props: PageProps<"/compare">) {
       </section>
 
       <ComparisonTable products={comparedProducts} />
-
-      <ProductJourneyCompare products={comparedProducts} />
 
       {/* Add-to-compare suggestions */}
       {suggestions.length > 0 && comparedProducts.length < 4 && (
