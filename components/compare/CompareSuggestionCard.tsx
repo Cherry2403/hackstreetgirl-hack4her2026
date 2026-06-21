@@ -1,9 +1,9 @@
-import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { productImage } from "@/lib/format";
 import Price from "@/components/Price";
 import StarRating from "@/components/StarRating";
 import { getT } from "@/lib/i18n/server";
+import AddSuggestionToCompareLink from "@/components/compare/AddSuggestionToCompareLink";
 
 /**
  * A compare-page suggestion card. Mirrors the product-header card in
@@ -38,12 +38,18 @@ export default async function CompareSuggestionCard({
       <div className="mt-1">
         <Price amount={product.price} size="md" className="text-[#e2240f]" />
       </div>
-      <Link
+      <AddSuggestionToCompareLink
+        item={{
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          rating: product.rating,
+          reviewCount: product.reviewCount,
+        }}
         href={addHref}
-        className="mt-2 rounded-full border border-bol-blue px-3 py-1.5 text-center text-xs font-bold text-bol-blue hover:bg-bol-blue hover:text-white"
       >
         + {t("compare.add")}
-      </Link>
+      </AddSuggestionToCompareLink>
     </div>
   );
 }
