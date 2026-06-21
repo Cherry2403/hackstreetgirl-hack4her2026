@@ -34,16 +34,15 @@ export default function SustainabilityDrawer({
         type="button"
         onClick={() => setOpen(true)}
         aria-label="View sustainability details"
-        className={
-          showScore
-            ? "inline-flex items-center gap-2 rounded-full bg-bol-green px-3 py-1.5 text-sm font-bold text-white hover:bg-bol-green/90"
-            : "inline-flex h-9 w-9 items-center justify-center rounded-full bg-bol-green text-white hover:bg-bol-green/90"
-        }
+        className="inline-flex items-center gap-2 rounded-full bg-bol-green px-3 py-1.5 text-sm font-bold text-white hover:bg-bol-green/90"
       >
         {showScore ? (
           `${result.score}/100 · ${result.grade}`
         ) : (
-          <LeafIcon className="h-5 w-5" />
+          <div className="flex flex-row gap-1">
+            <LeafIcon className="h-5 w-5" />
+            <p>Details</p>
+          </div>
         )}
       </button>
 
@@ -128,14 +127,25 @@ export default function SustainabilityDrawer({
 
                 {/* Key facts (no carbon-neutral row) */}
                 <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
-                  <Fact label="CO₂ footprint" value={product.co2Kg != null ? `${product.co2Kg} kg` : "—"} />
+                  <Fact
+                    label="CO₂ footprint"
+                    value={product.co2Kg != null ? `${product.co2Kg} kg` : "—"}
+                  />
                   <Fact
                     label="Expected lifespan"
-                    value={product.lifespanYears != null ? `${product.lifespanYears} yr` : "—"}
+                    value={
+                      product.lifespanYears != null
+                        ? `${product.lifespanYears} yr`
+                        : "—"
+                    }
                   />
                   <Fact
                     label="Recyclable"
-                    value={product.recyclablePct != null ? `${product.recyclablePct}%` : "—"}
+                    value={
+                      product.recyclablePct != null
+                        ? `${product.recyclablePct}%`
+                        : "—"
+                    }
                   />
                 </dl>
 
