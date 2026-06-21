@@ -12,9 +12,9 @@ interface JourneyStep {
   shopperQuestion: string;
 }
 
-interface JourneyField {
+interface JourneyRow {
   label: string;
-  value: string;
+  values: string[];
 }
 
 const STEPS: JourneyStep[] = [
@@ -54,6 +54,8 @@ export default function ProductJourneyCompare({
   const visibleProducts = products.slice(0, 4);
   const [activeStep, setActiveStep] = useState<JourneyStepId>("production");
   const step = STEPS.find((item) => item.id === activeStep) ?? STEPS[0];
+  const gridCols = `minmax(150px,1fr) repeat(${visibleProducts.length}, minmax(0,1fr))`;
+  const rows = journeyRows(visibleProducts, step.id);
 
   if (visibleProducts.length < 2) return null;
 
@@ -112,14 +114,36 @@ export default function ProductJourneyCompare({
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {visibleProducts.map((product) => (
-          <JourneyProductPanel
-            key={product.id}
-            product={product}
-            step={step}
-          />
-        ))}
+      <div className="mt-4 overflow-x-auto">
+        <div className="min-w-[680px] rounded-xl border border-bol-border bg-white">
+          {rows.length > 0 ? (
+            <div className="divide-y divide-bol-border">
+              {rows.map((row, index) => (
+                <div
+                  key={row.label}
+                  className={`grid gap-3 px-4 py-3 text-sm ${
+                    index % 2 === 0 ? "bg-white" : "bg-bol-gray/60"
+                  }`}
+                  style={{ gridTemplateColumns: gridCols }}
+                >
+                  <span className="font-medium text-zinc-600">{row.label}</span>
+                  {row.values.map((value, valueIndex) => (
+                    <span
+                      key={`${row.label}-${valueIndex}`}
+                      className="font-semibold text-bol-ink"
+                    >
+                      {value}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="px-4 py-3 text-sm font-semibold text-amber-800">
+              No data for this lens
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -150,80 +174,42 @@ export default function ProductJourneyCompare({
   );
 }
 
-function JourneyProductPanel({
-  product,
-  step,
-}: {
-  product: Product;
-  step: JourneyStep;
-}) {
-  const fields = journeyFields(product, step.id);
-
-  return (
-    <article className="rounded-lg border border-bol-border bg-white p-4">
-      <h3 className="line-clamp-2 min-h-11 text-base font-bold leading-snug text-bol-ink">
-        {product.name}
-      </h3>
-
-      <div className="mt-3 space-y-2">
-        {fields.length > 0 ? (
-          fields.map((field) => (
-            <div
-              key={field.label}
-              className="flex items-start justify-between gap-3 rounded-lg bg-bol-gray px-3 py-2 text-sm"
-            >
-              <span className="text-zinc-500">{field.label}</span>
-              <span className="text-right font-bold text-bol-ink">{field.value}</span>
-            </div>
-          ))
-        ) : (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800">
-            No data for this lens
-          </div>
-        )}
-      </div>
-    </article>
-  );
-}
-
-function journeyFields(product: Product, step: JourneyStepId): JourneyField[] {
+function journeyRows(products: Product[], step: JourneyStepId): JourneyRow[] {
   if (step === "production") {
-    return compactFields([
-      ["CO₂ footprint", product.co2Kg != null ? `${product.co2Kg} kg` : null],
-      ["Origin", product.countryOfOrigin],
-      ["Packaging", product.packaging],
-      ["Carbon neutral", product.carbonNeutral ? "Certified" : null],
-      ["Origin label", originLabel(product.ecoLabel)],
+    return compactRows([
+      ["CO₂ footprint", products.map((p) => (p.co2Kg != null ? `${p.co2Kg} kg` : "–"))],
+      ["Origin", products.map((p) => p.countryOfOrigin || "–")],
+      ["Packaging", products.map((p) => p.packaging || "–")],
+      ["Carbon neutral", products.map((p) => (p.carbonNeutral ? "Certified" : "–"))],
+      ["Origin label", products.map((p) => originLabel(p.ecoLabel) ?? "–")],
     ]);
   }
 
   if (step === "delivery") {
-    return compactFields([
-      ["Warehouse", product.warehouseName],
-      ["Standard", product.normalDelivery ? "Available" : null],
-      ["Next day", product.nextDay ? "Available" : null],
-      ["Same day", product.sameDay ? "Available" : null],
+    return compactRows([
+      ["Warehouse", products.map((p) => p.warehouseName || "–")],
+      ["Standard", products.map((p) => (p.normalDelivery ? "Available" : "–"))],
+      ["Next day", products.map((p) => (p.nextDay ? "Available" : "–"))],
+      ["Same day", products.map((p) => (p.sameDay ? "Available" : "–"))],
     ]);
   }
 
-  return compactFields([
-    ["Lifespan", product.lifespanYears != null ? `${product.lifespanYears} years` : null],
-    ["Price range", priceRange(product)],
+  return compactRows([
+    ["Lifespan", products.map((p) => (p.lifespanYears != null ? `${p.lifespanYears} years` : "–"))],
+    ["Price range", products.map(priceRange)],
     [
       "Repairability",
-      product.repairability != null
-        ? `${product.repairability}/${product.repairability <= 5 ? 5 : 10}`
-        : null,
+      products.map((p) =>
+        p.repairability != null ? `${p.repairability}/${p.repairability <= 5 ? 5 : 10}` : "–",
+      ),
     ],
-    ["Recyclable", product.recyclablePct != null ? `${product.recyclablePct}%` : null],
-    ["Future label", futureLabel(product.ecoLabel)],
+    ["Recyclable", products.map((p) => (p.recyclablePct != null ? `${p.recyclablePct}%` : "–"))],
+    ["Future label", products.map((p) => futureLabel(p.ecoLabel) ?? "–")],
   ]);
 }
 
-function compactFields(rows: Array<[string, string | null | undefined]>): JourneyField[] {
-  return rows
-    .filter(([, value]) => Boolean(value))
-    .map(([label, value]) => ({ label, value: value as string }));
+function compactRows(rows: Array<[string, string[]]>): JourneyRow[] {
+  return rows.map(([label, values]) => ({ label, values })).filter((row) => row.values.some((value) => value !== "–"));
 }
 
 function originLabel(label: string): string | null {
