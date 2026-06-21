@@ -8,6 +8,7 @@ import ProductJourneyCompare from "@/components/ProductJourneyCompare";
 interface ComparisonRow {
   label: string;
   values: string[];
+  bestIndex?: number;
 }
 
 interface ComparisonGroup {
@@ -77,8 +78,18 @@ function ComparisonSection({
               >
                 <span className="font-medium text-zinc-600">{row.label}</span>
                 {row.values.map((value, valueIndex) => (
-                  <span key={`${row.label}-${valueIndex}`} className="font-semibold text-bol-ink">
+                  <span
+                    key={`${row.label}-${valueIndex}`}
+                    className={`font-semibold ${
+                      row.bestIndex === valueIndex
+                        ? "text-bol-green"
+                        : "text-bol-ink"
+                    }`}
+                  >
                     {value}
+                    {row.bestIndex === valueIndex && (
+                      <span className="ml-1 text-xs font-normal text-bol-green">★</span>
+                    )}
                   </span>
                 ))}
               </div>
@@ -119,11 +130,51 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
       ]),
     },
     {
-      title: "Sustainability",
+      title: "Sustainability scores",
+      rows: filterRows([
+        {
+          label: "Score",
+          values: products.map((p) => `${p.sustainabilityScore}/100`),
+          bestIndex: argmax(products.map((p) => p.sustainabilityScore)),
+        },
+        {
+          label: "Grade",
+          values: products.map((p) => p.sustainabilityGrade),
+        },
+        {
+          label: "Confidence",
+          values: products.map((p) => `${p.sustainabilityConfidence}%`),
+          bestIndex: argmax(products.map((p) => p.sustainabilityConfidence)),
+        },
+        {
+          label: "Value (pts/€)",
+          values: products.map((p) =>
+            p.price > 0 ? (p.sustainabilityScore / p.price).toFixed(2) : "–"
+          ),
+          bestIndex: argmax(
+            products.map((p) => (p.price > 0 ? p.sustainabilityScore / p.price : -1))
+          ),
+        },
+        {
+          label: "Eco label",
+          values: products.map((p) => p.ecoLabel || "–"),
+        },
+        {
+          label: "Carbon neutral",
+          values: products.map((p) => yesNo(p.carbonNeutral)),
+        },
+      ]),
+    },
+    {
+      title: "Sustainability journey",
       rows: [],
       custom: <ProductJourneyCompare products={products} embedded />,
     },
   ].filter((group) => group.custom || group.rows.length > 0);
+}
+
+function argmax(values: number[]): number {
+  return values.reduce((best, v, i) => (v > values[best] ? i : best), 0);
 }
 
 function filterRows(rows: ComparisonRow[]): ComparisonRow[] {
