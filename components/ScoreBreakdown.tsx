@@ -6,7 +6,7 @@ export default function ScoreBreakdown({
   result: SustainabilityScoreResult;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-2 gap-6">
       {result.calculationBreakdown.map((item) => (
         <div key={item.key}>
           <div className="mb-1 flex items-center justify-between gap-3 text-sm">
@@ -19,9 +19,7 @@ export default function ScoreBreakdown({
               style={{ width: `${item.score}%` }}
             />
           </div>
-          <p className="mt-1 text-xs text-zinc-500">
-            Weight {Math.round(item.weight * 100)}% · {item.explanation}
-          </p>
+          <p className="mt-1 text-xs text-zinc-500">{item.explanation}</p>
         </div>
       ))}
     </div>

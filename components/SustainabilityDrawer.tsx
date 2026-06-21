@@ -24,6 +24,7 @@ export default function SustainabilityDrawer({
   analogy: ImpactAnalogyValue;
 }) {
   const [open, setOpen] = useState(false);
+  const [showFormula, setShowFormula] = useState(false);
   const result = product.sustainability;
   const ecoImg = ecoLabelImage(product.ecoLabel);
   const showScore = result.grade === "A" || result.grade === "B";
@@ -54,7 +55,7 @@ export default function SustainabilityDrawer({
             className="absolute inset-0 bg-black/35"
             onClick={() => setOpen(false)}
           />
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-xl flex-col overflow-y-auto bg-bol-gray shadow-2xl">
+          <aside className="absolute right-0 top-0 flex h-full w-full max-w-1/2 flex-col overflow-y-auto bg-bol-gray shadow-2xl">
             {/* Header — bol blue bar */}
             <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-bol-blue px-5 py-4 text-white">
               <div>
@@ -87,9 +88,83 @@ export default function SustainabilityDrawer({
                             /100
                           </span>
                         </p>
-                        <p className="text-sm text-zinc-500">
-                          Sustainability score
-                        </p>
+                        <div className="relative flex items-center gap-1">
+                          <p className="text-sm text-zinc-500">
+                            Sustainability score
+                          </p>
+                          <button
+                            type="button"
+                            aria-label="Show scoring formula"
+                            onClick={() => setShowFormula((v) => !v)}
+                            className="text-zinc-400 hover:text-bol-blue"
+                          >
+                            <InfoIcon className="h-4 w-4" />
+                          </button>
+                          {showFormula && (
+                            <div className="absolute left-0 top-6 z-20 w-72 rounded-xl border border-bol-border bg-white p-4 shadow-lg text-xs text-zinc-700">
+                              <p className="font-bold text-bol-ink mb-2">
+                                How the score is calculated
+                              </p>
+                              <p className="mb-2 text-zinc-500">
+                                Score = Σ (component × weight) ÷ Σ (active
+                                weights)
+                              </p>
+                              <table className="w-full mb-3">
+                                <thead>
+                                  <tr className="text-zinc-400 border-b border-zinc-100">
+                                    <th className="text-left pb-1 font-medium">
+                                      Component
+                                    </th>
+                                    <th className="text-right pb-1 font-medium">
+                                      Weight
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {result.calculationBreakdown.map((item) => (
+                                    <tr
+                                      key={item.key}
+                                      className="border-b border-zinc-50"
+                                    >
+                                      <td className="py-0.5">{item.label}</td>
+                                      <td className="text-right py-0.5 text-zinc-500">
+                                        {Math.round(item.weight * 100)}%
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              <p className="font-semibold text-bol-ink mb-1">
+                                Grade thresholds
+                              </p>
+                              <div className="flex gap-2 flex-wrap">
+                                {(
+                                  [
+                                    "A ≥ 85",
+                                    "B ≥ 70",
+                                    "C ≥ 55",
+                                    "D ≥ 40",
+                                    "E < 40",
+                                  ] as const
+                                ).map((g) => (
+                                  <span
+                                    key={g}
+                                    className="rounded bg-zinc-100 px-1.5 py-0.5"
+                                  >
+                                    {g}
+                                  </span>
+                                ))}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowFormula(false)}
+                                className="mt-3 text-xs text-bol-blue hover:underline"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <span
                         className={`rounded-lg px-3 py-1.5 text-lg font-black text-white ${
@@ -99,13 +174,7 @@ export default function SustainabilityDrawer({
                         {result.grade}
                       </span>
                     </div>
-
-                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-bol-gray">
-                      <div
-                        className="h-full rounded-full bg-bol-green"
-                        style={{ width: `${result.score}%` }}
-                      />
-                    </div>
+                    <ScoreBreakdown result={result} />
                   </>
                 )}
 
@@ -178,15 +247,6 @@ export default function SustainabilityDrawer({
                 </h3>
                 <ProductTimeMachine product={product} />
               </section>
-
-              {showScore && (
-                <section className="rounded-xl border border-bol-border bg-white p-4">
-                  <h3 className="mb-3 text-base font-bold text-bol-ink">
-                    Score breakdown
-                  </h3>
-                  <ScoreBreakdown result={result} />
-                </section>
-              )}
             </div>
           </aside>
         </div>
@@ -195,12 +255,16 @@ export default function SustainabilityDrawer({
   );
 }
 
-function Fact({ label, value }: { label: string; value: string }) {
+function InfoIcon({ className = "" }: { className?: string }) {
   return (
-    <div className="rounded-lg bg-bol-gray p-3">
-      <dt className="text-xs text-zinc-500">{label}</dt>
-      <dd className="mt-0.5 font-bold text-bol-ink">{value}</dd>
-    </div>
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+    </svg>
   );
 }
 
