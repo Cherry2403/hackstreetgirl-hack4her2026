@@ -6,6 +6,7 @@ import type { ImpactAnalogy } from "@/lib/analogy";
 import Price from "@/components/Price";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import SustainabilityDrawer from "@/components/SustainabilityDrawer";
+import { useCart } from "@/components/cart/CartContext";
 
 /** bol-style right-hand purchase column. */
 export default function BuyBox({
@@ -16,6 +17,7 @@ export default function BuyBox({
   analogy: ImpactAnalogy;
 }) {
   const { t } = useLanguage();
+  const { addToCart } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -70,6 +72,7 @@ export default function BuyBox({
 
       <button
         onClick={() => {
+          addToCart({ id: product.id, name: product.name, price: product.price }, qty);
           setAdded(true);
           setTimeout(() => setAdded(false), 1800);
         }}

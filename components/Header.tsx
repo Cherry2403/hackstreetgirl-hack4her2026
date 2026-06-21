@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import HeaderAnimal from "@/components/animals/HeaderAnimal";
+import { useCart } from "@/components/cart/CartContext";
 
 const CATEGORIES = [
   "Fitness",
@@ -22,6 +23,7 @@ export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
+  const { totalItems } = useCart();
   const currentQuery = searchParams.get("q") ?? "";
 
   function onSubmit(e: React.FormEvent) {
@@ -110,9 +112,11 @@ export default function Header() {
               className="relative hover:opacity-80"
             >
               <CartIcon className="h-6 w-6" />
-              <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-bol-yellow px-1 text-xs font-bold text-bol-ink">
-                1
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-bol-yellow px-1 text-xs font-bold text-bol-ink">
+                  {totalItems}
+                </span>
+              )}
             </Link>
           </nav>
         </div>

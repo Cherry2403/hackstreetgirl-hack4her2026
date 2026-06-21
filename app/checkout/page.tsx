@@ -5,18 +5,13 @@ import Link from "next/link";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { ANIMALS } from "@/lib/animals";
 import AnimalUnlockModal from "@/components/animals/AnimalUnlockModal";
-
-const MOCK_ITEM = {
-  name: "Hunkemöller Swimsuit Luxury Red",
-  seller: "Hunkemöller NL",
-  price: 29.99,
-  image: "https://u-mercari-images.mercdn.net/photos/m65370248386_2.jpg?1758322022",
-};
+import { useCart } from "@/components/cart/CartContext";
 
 type PayMethod = "ideal" | "creditcard" | "paypal";
 
 export default function CheckoutPage() {
   const { t } = useLanguage();
+  const { items, totalItems, totalPrice, clear } = useCart();
   const [method, setMethod] = useState<PayMethod>("ideal");
   const [paying, setPaying] = useState(false);
   const [unlockedAnimal, setUnlockedAnimal] = useState<(typeof ANIMALS)[0] | null>(null);
@@ -24,8 +19,8 @@ export default function CheckoutPage() {
   function handlePay() {
     setPaying(true);
     setTimeout(() => {
+      clear();
       setPaying(false);
-      // Pick a random animal to unlock
       const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
       setUnlockedAnimal(animal);
     }, 1800);
@@ -117,46 +112,51 @@ export default function CheckoutPage() {
             <div className="rounded-xl border border-bol-border bg-white p-5">
               <h2 className="mb-4 font-bold text-bol-ink">{t("checkout.orderSummary")}</h2>
 
-              {/* Product row */}
-              <div className="flex gap-3 border-b border-bol-border pb-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={MOCK_ITEM.image}
-                  alt={MOCK_ITEM.name}
-                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
-                />
-                <div className="flex flex-1 flex-col justify-between">
-                  <p className="text-sm font-medium leading-snug text-bol-ink line-clamp-2">
-                    {MOCK_ITEM.name}
-                  </p>
-                  <p className="text-xs text-zinc-400">{MOCK_ITEM.seller}</p>
-                </div>
-                <p className="shrink-0 font-bold text-bol-ink">
-                  € {MOCK_ITEM.price.toFixed(2)}
-                </p>
+              {/* Product rows */}
+              <div className="divide-y divide-bol-border border-b border-bol-border pb-4">
+                {items.length === 0 ? (
+                  <p className="py-2 text-sm text-zinc-400">No items in cart.</p>
+                ) : (
+                  items.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3 py-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-bol-gray text-sm font-bold text-zinc-400">
+                        {item.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex flex-1 flex-col">
+                        <p className="text-sm font-medium leading-snug text-bol-ink line-clamp-2">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-zinc-400">qty {item.qty}</p>
+                      </div>
+                      <p className="shrink-0 font-bold text-bol-ink">
+                        € {(item.price * item.qty).toFixed(2)}
+                      </p>
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* Totals */}
               <div className="mt-3 space-y-2 text-sm text-zinc-600">
                 <div className="flex justify-between">
-                  <span>Subtotaal</span>
-                  <span>€ {MOCK_ITEM.price.toFixed(2)}</span>
+                  <span>{t("cart.totalItems")} ({totalItems})</span>
+                  <span>€ {totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Verzendkosten</span>
+                  <span>{t("cart.shippingCosts")}</span>
                   <span className="text-bol-green">€ 0,00</span>
                 </div>
               </div>
 
               <div className="my-4 flex justify-between rounded-lg bg-[#fffbe6] px-4 py-3 font-bold text-bol-ink">
-                <span>Totaal</span>
-                <span>€ {MOCK_ITEM.price.toFixed(2)}</span>
+                <span>{t("cart.stillToPay")}</span>
+                <span>€ {totalPrice.toFixed(2)}</span>
               </div>
 
               {/* PAY button */}
               <button
                 onClick={handlePay}
-                disabled={paying}
+                disabled={paying || items.length === 0}
                 className="w-full rounded-full bg-bol-blue py-3.5 font-bold text-white transition-colors hover:bg-bol-blue-dark disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {paying ? (

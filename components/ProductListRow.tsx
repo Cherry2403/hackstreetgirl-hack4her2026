@@ -119,6 +119,7 @@ export default async function ProductListRow({ product }: { product: Product }) 
         </p>
         <div className="mt-1">
           <AddToCartButton
+            product={{ id: product.id, name: product.name, price: product.price }}
             label={t("common.addToCart")}
             addedLabel={t("common.added")}
           />
