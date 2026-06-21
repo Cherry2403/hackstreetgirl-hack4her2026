@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Product } from "@/lib/products";
 
 interface ComparisonRow {
@@ -5,9 +8,14 @@ interface ComparisonRow {
   values: string[];
 }
 
+interface ComparisonGroup {
+  title: string;
+  rows: ComparisonRow[];
+}
+
 export default function ComparisonTable({ products }: { products: Product[] }) {
   const gridCols = `minmax(150px,1fr) repeat(${products.length}, minmax(0,1fr))`;
-  const rows = buildRows(products);
+  const groups = buildGroups(products);
 
   return (
     <section className="mt-8 overflow-x-auto">
@@ -20,7 +28,42 @@ export default function ComparisonTable({ products }: { products: Product[] }) {
         </div>
 
         <div className="divide-y divide-bol-border">
-          {rows.map((row, index) => (
+          {groups.map((group) => (
+            <ComparisonSection
+              key={group.title}
+              group={group}
+              gridCols={gridCols}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComparisonSection({
+  group,
+  gridCols,
+}: {
+  group: ComparisonGroup;
+  gridCols: string;
+}) {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <section>
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="flex w-full items-center justify-between bg-white px-4 py-3 text-left hover:bg-bol-gray/70"
+      >
+        <span className="font-bold text-bol-ink">{group.title}</span>
+        <span className="text-xl leading-none text-zinc-400">{open ? "−" : "+"}</span>
+      </button>
+
+      {open && (
+        <div className="divide-y divide-bol-border">
+          {group.rows.map((row, index) => (
             <div
               key={row.label}
               className={`grid gap-3 px-4 py-3 text-sm ${
@@ -37,47 +80,73 @@ export default function ComparisonTable({ products }: { products: Product[] }) {
             </div>
           ))}
         </div>
-
-      </div>
+      )}
     </section>
   );
 }
 
-function buildRows(products: Product[]): ComparisonRow[] {
-  const rows = [
-    { label: "Category", values: products.map((p) => p.category || "–") },
-    { label: "Subcategory", values: products.map((p) => p.subcategory || "–") },
-    { label: "Price", values: products.map((p) => euro(p.price)) },
+function buildGroups(products: Product[]): ComparisonGroup[] {
+  return [
     {
-      label: "Rating",
-      values: products.map((p) => `${p.rating.toFixed(1)} (${p.reviewCount} reviews)`),
-    },
-    { label: "Delivery", values: products.map(deliveryLabel) },
-    { label: "Available today", values: products.map((p) => yesNo(p.sameDay)) },
-    { label: "Available tomorrow", values: products.map((p) => yesNo(p.nextDay)) },
-    { label: "Brand", values: products.map((p) => p.brand || "–") },
-    {
-      label: "Lifespan",
-      values: products.map((p) => (p.lifespanYears != null ? `${p.lifespanYears} years` : "–")),
+      title: "Price & reviews",
+      rows: filterRows([
+        { label: "Price", values: products.map((p) => euro(p.price)) },
+        {
+          label: "Rating",
+          values: products.map((p) => `${p.rating.toFixed(1)} (${p.reviewCount} reviews)`),
+        },
+      ]),
     },
     {
-      label: "Repairability",
-      values: products.map((p) =>
-        p.repairability != null ? `${p.repairability}/${p.repairability <= 5 ? 5 : 10}` : "–",
-      ),
-    },
-    { label: "Packaging", values: products.map((p) => p.packaging || "–") },
-    {
-      label: "Recyclability",
-      values: products.map((p) => (p.recyclablePct != null ? `${p.recyclablePct}%` : "–")),
+      title: "Delivery",
+      rows: filterRows([
+        { label: "Delivery", values: products.map(deliveryLabel) },
+        { label: "Available today", values: products.map((p) => yesNo(p.sameDay)) },
+        { label: "Available tomorrow", values: products.map((p) => yesNo(p.nextDay)) },
+      ]),
     },
     {
-      label: "CO₂ footprint",
-      values: products.map((p) => (p.co2Kg != null ? `${p.co2Kg} kg` : "–")),
+      title: "Product info",
+      rows: filterRows([
+        { label: "Brand", values: products.map((p) => p.brand || "–") },
+        { label: "Category", values: products.map((p) => p.category || "–") },
+        { label: "Subcategory", values: products.map((p) => p.subcategory || "–") },
+      ]),
     },
-    { label: "Eco-label", values: products.map((p) => p.ecoLabel || "–") },
-  ];
+    {
+      title: "Durability & use",
+      rows: filterRows([
+        {
+          label: "Lifespan",
+          values: products.map((p) => (p.lifespanYears != null ? `${p.lifespanYears} years` : "–")),
+        },
+        {
+          label: "Repairability",
+          values: products.map((p) =>
+            p.repairability != null ? `${p.repairability}/${p.repairability <= 5 ? 5 : 10}` : "–",
+          ),
+        },
+      ]),
+    },
+    {
+      title: "Materials & labels",
+      rows: filterRows([
+        { label: "Packaging", values: products.map((p) => p.packaging || "–") },
+        {
+          label: "Recyclability",
+          values: products.map((p) => (p.recyclablePct != null ? `${p.recyclablePct}%` : "–")),
+        },
+        {
+          label: "CO₂ footprint",
+          values: products.map((p) => (p.co2Kg != null ? `${p.co2Kg} kg` : "–")),
+        },
+        { label: "Eco-label", values: products.map((p) => p.ecoLabel || "–") },
+      ]),
+    },
+  ].filter((group) => group.rows.length > 0);
+}
 
+function filterRows(rows: ComparisonRow[]): ComparisonRow[] {
   return rows.filter((row) => row.values.some((value) => value !== "–"));
 }
 
