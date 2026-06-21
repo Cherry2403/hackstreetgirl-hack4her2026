@@ -2,25 +2,25 @@ export type SustainabilityGrade = "A" | "B" | "C" | "D" | "E";
 
 export type ScoreComponent =
   | "co2"
-  | "lifespan"
-  | "repairability"
-  | "recyclability"
   | "packaging"
-  | "certification"
-  | "delivery";
+  | "recyclable"
+  | "repairability"
+  | "lifespan"
+  | "eco_label"
+  | "carbon_neutral"
+  | "warehouse"
+  | "country";
 
 export interface SustainabilityScoreInput {
-  category: string;
   co2Kg: number | null;
-  lifespanYears: number | null;
-  repairability: number | null;
-  recyclablePct: number | null;
   packaging: string;
+  recyclablePct: number | null;
+  repairability: number | null;
+  lifespanYears: number | null;
   ecoLabel: string;
-  carbonNeutral: boolean;
-  sameDay: boolean;
-  nextDay: boolean;
-  normalDelivery: boolean;
+  carbonNeutral: boolean | null;
+  warehouseName: string;
+  countryOfOrigin: string;
 }
 
 export interface ScoreBreakdownItem {
@@ -43,106 +43,49 @@ export interface SustainabilityScoreResult {
   isSustainable: boolean;
 }
 
-type Weights = Record<ScoreComponent, number>;
-
-const DEFAULT_WEIGHTS: Weights = {
-  co2: 0.3,
-  lifespan: 0.2,
-  repairability: 0.15,
-  recyclability: 0.15,
-  packaging: 0.1,
-  certification: 0.05,
-  delivery: 0.05,
+const WEIGHTS: Record<ScoreComponent, number> = {
+  co2: 0.35,
+  packaging: 0.15,
+  recyclable: 0.10,
+  repairability: 0.10,
+  lifespan: 0.10,
+  eco_label: 0.05,
+  carbon_neutral: 0.05,
+  warehouse: 0.05,
+  country: 0.05,
 };
 
-const CATEGORY_WEIGHTS: Record<string, Weights> = {
-  Electronics: {
-    co2: 0.25,
-    lifespan: 0.25,
-    repairability: 0.2,
-    recyclability: 0.15,
-    packaging: 0.1,
-    certification: 0.03,
-    delivery: 0.02,
-  },
-  Fitness: {
-    co2: 0.25,
-    lifespan: 0.25,
-    repairability: 0.2,
-    recyclability: 0.15,
-    packaging: 0.1,
-    certification: 0.03,
-    delivery: 0.02,
-  },
-  "Home & Garden": {
-    co2: 0.25,
-    lifespan: 0.25,
-    repairability: 0.2,
-    recyclability: 0.15,
-    packaging: 0.1,
-    certification: 0.03,
-    delivery: 0.02,
-  },
-  Fashion: {
-    co2: 0.25,
-    lifespan: 0.2,
-    repairability: 0.05,
-    recyclability: 0.25,
-    packaging: 0.15,
-    certification: 0.07,
-    delivery: 0.03,
-  },
-  Baby: {
-    co2: 0.25,
-    lifespan: 0.2,
-    repairability: 0.05,
-    recyclability: 0.25,
-    packaging: 0.15,
-    certification: 0.07,
-    delivery: 0.03,
-  },
-  "Beauty & Skincare": {
-    co2: 0.3,
-    lifespan: 0.05,
-    repairability: 0,
-    recyclability: 0.2,
-    packaging: 0.25,
-    certification: 0.15,
-    delivery: 0.05,
-  },
-  "Food & Beverage": {
-    co2: 0.3,
-    lifespan: 0.05,
-    repairability: 0,
-    recyclability: 0.2,
-    packaging: 0.25,
-    certification: 0.15,
-    delivery: 0.05,
-  },
-  "Digital Goods": {
-    co2: 0.45,
-    lifespan: 0.1,
-    repairability: 0,
-    recyclability: 0.05,
-    packaging: 0.05,
-    certification: 0.2,
-    delivery: 0.15,
-  },
-};
+const ALPHA = 0.3;
 
-const labels: Record<ScoreComponent, string> = {
+const COMPONENT_LABELS: Record<ScoreComponent, string> = {
   co2: "CO2 footprint",
-  lifespan: "Expected lifespan",
-  repairability: "Repairability",
-  recyclability: "Recyclable material",
   packaging: "Packaging",
-  certification: "Certification",
-  delivery: "Delivery",
+  recyclable: "Recyclable material",
+  repairability: "Repairability",
+  lifespan: "Expected lifespan",
+  eco_label: "Eco label",
+  carbon_neutral: "Carbon neutral",
+  warehouse: "Warehouse",
+  country: "Country of origin",
 };
 
-function clamp(n: number, min = 0, max = 100): number {
-  return Math.max(min, Math.min(max, n));
-}
+const PACKAGING_SCORES: Record<string, number> = {
+  "Digital - No Packaging": 1.0,
+  "Biodegradable": 0.9,
+  "Recyclable Cardboard": 0.85,
+  "Minimal Packaging": 0.75,
+  "Mixed Plastic+Cardboard": 0.55,
+  "Plastic": 0.40,
+  "Foam + Plastic": 0.25,
+};
+
+const ECO_LABEL_SCORES: Record<string, number> = {
+  "Cradle to Cradle": 1.0,
+  "EU Ecolabel": 0.9,
+  "Energy Star": 0.8,
+  "FSC Certified": 0.7,
+  "Fair Trade": 0.6,
+};
 
 function gradeFor(score: number): SustainabilityGrade {
   if (score >= 85) return "A";
@@ -152,127 +95,102 @@ function gradeFor(score: number): SustainabilityGrade {
   return "E";
 }
 
-function co2Benchmark(category: string): number {
-  if (category === "Digital Goods") return 12;
-  if (category === "Food & Beverage" || category === "Beauty & Skincare") return 8;
-  if (category === "Fashion" || category === "Baby") return 25;
-  if (category === "Electronics" || category === "Fitness" || category === "Home & Garden")
-    return 75;
-  return 40;
+function normalize(key: ScoreComponent, input: SustainabilityScoreInput): number | null {
+  switch (key) {
+    case "co2":
+      return input.co2Kg == null ? null : Math.max(0, 1 - input.co2Kg / 100);
+    case "packaging": {
+      const v = PACKAGING_SCORES[input.packaging.trim()];
+      return v ?? null;
+    }
+    case "recyclable":
+      return input.recyclablePct == null ? null : input.recyclablePct / 100;
+    case "repairability":
+      return input.repairability == null ? null : Math.min(input.repairability / 9, 1);
+    case "lifespan":
+      return input.lifespanYears == null ? null : Math.min(input.lifespanYears / 10, 1);
+    case "eco_label": {
+      const v = ECO_LABEL_SCORES[input.ecoLabel.trim()];
+      return v ?? null;
+    }
+    case "carbon_neutral":
+      return input.carbonNeutral == null ? null : input.carbonNeutral ? 1.0 : 0.0;
+    case "warehouse":
+      return input.warehouseName
+        ? input.warehouseName.toLowerCase().includes("perfect") ? 1.0 : 0.5
+        : null;
+    case "country":
+      return input.countryOfOrigin
+        ? ["netherlands", "belgium"].includes(input.countryOfOrigin.toLowerCase()) ? 1.0 : 0.5
+        : null;
+  }
 }
 
-function lifespanBenchmark(category: string): number {
-  if (category === "Food & Beverage" || category === "Beauty & Skincare") return 1;
-  if (category === "Fashion" || category === "Baby") return 4;
-  if (category === "Digital Goods") return 5;
-  return 10;
-}
-
-export function repairabilityPercent(repairability: number | null): number | null {
-  if (repairability == null) return null;
-  const denominator = repairability <= 5 ? 5 : 10;
-  return clamp((repairability / denominator) * 100);
-}
-
-export function packagingScore(packaging: string): number | null {
-  const value = packaging.trim().toLowerCase();
-  if (!value) return null;
-  if (value.includes("no packaging") || value.includes("none")) return 100;
-  if (value.includes("biodegradable") || value.includes("compost")) return 92;
-  if (value.includes("minimal")) return 84;
-  if (value.includes("recyclable") || value.includes("cardboard") || value.includes("paper"))
-    return 78;
-  if (value.includes("glass")) return 68;
-  if (value.includes("plastic")) return 42;
-  if (value.includes("foam")) return 24;
-  return 55;
-}
-
-function deliveryScore(input: SustainabilityScoreInput): number | null {
-  if (input.normalDelivery) return 88;
-  if (input.nextDay) return 68;
-  if (input.sameDay) return 52;
-  return null;
-}
-
-function certificationScore(input: SustainabilityScoreInput): number | null {
-  if (!input.ecoLabel && !input.carbonNeutral) return null;
-  if (input.ecoLabel && input.carbonNeutral) return 100;
-  if (input.carbonNeutral) return 84;
-  return 76;
-}
+const EXPLANATIONS: Record<ScoreComponent, string> = {
+  co2: "Lower CO2 footprint is better.",
+  packaging: "Less-impact packaging improves the score.",
+  recyclable: "Higher recyclable material percentage is better.",
+  repairability: "Repairable products can stay useful longer.",
+  lifespan: "Longer expected use improves the score.",
+  eco_label: "Recognised eco labels add trust.",
+  carbon_neutral: "Carbon-neutral certification is rewarded.",
+  warehouse: "Products from the Perfect warehouse score higher.",
+  country: "Products from the Netherlands or Belgium score higher.",
+};
 
 function pushInsight(
   strengths: string[],
   warnings: string[],
-  key: ScoreComponent,
+  label: string,
   score: number,
 ): void {
-  if (score >= 78) strengths.push(`This product scores well for ${labels[key].toLowerCase()}.`);
-  if (score < 45) warnings.push(`${labels[key]} is a weak point for this product.`);
+  if (score >= 78) strengths.push(`This product scores well for ${label.toLowerCase()}.`);
+  if (score < 45) warnings.push(`${label} is a weak point for this product.`);
 }
 
 export function calculateSustainabilityScore(
   input: SustainabilityScoreInput,
 ): SustainabilityScoreResult {
-  const weights = CATEGORY_WEIGHTS[input.category] ?? DEFAULT_WEIGHTS;
-  const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
   const missingFields: string[] = [];
   const strengths: string[] = [];
   const warnings: string[] = [];
   const breakdown: ScoreBreakdownItem[] = [];
 
-  const add = (key: ScoreComponent, value: number | null, explanation: string) => {
-    const weight = weights[key];
-    if (weight <= 0) return;
-    if (value == null || !Number.isFinite(value)) {
-      missingFields.push(labels[key]);
-      return;
+  let availableWeightSum = 0;
+  let missingWeightSum = 0;
+  let availableScore = 0;
+
+  for (const key of Object.keys(WEIGHTS) as ScoreComponent[]) {
+    const weight = WEIGHTS[key];
+    const raw = normalize(key, input);
+
+    if (raw == null) {
+      missingWeightSum += weight;
+      missingFields.push(COMPONENT_LABELS[key]);
+      continue;
     }
-    const score = Math.round(clamp(value));
-    pushInsight(strengths, warnings, key, score);
+
+    const score = Math.round(Math.max(0, Math.min(1, raw)) * 100);
+    availableScore += raw * weight;
+    availableWeightSum += weight;
+
+    pushInsight(strengths, warnings, COMPONENT_LABELS[key], score);
     breakdown.push({
       key,
-      label: labels[key],
+      label: COMPONENT_LABELS[key],
       score,
       weight,
       weightedScore: score * weight,
-      explanation,
+      explanation: EXPLANATIONS[key],
     });
-  };
+  }
 
-  const co2Max = co2Benchmark(input.category);
-  add(
-    "co2",
-    input.co2Kg == null ? null : 100 - (input.co2Kg / co2Max) * 100,
-    `Lower CO2 is better for ${input.category || "this category"}.`,
-  );
-
-  const lifespanMax = lifespanBenchmark(input.category);
-  add(
-    "lifespan",
-    input.lifespanYears == null ? null : (input.lifespanYears / lifespanMax) * 100,
-    "Longer expected use improves the score.",
-  );
-
-  add(
-    "repairability",
-    repairabilityPercent(input.repairability),
-    "Repairable products can stay useful longer.",
-  );
-  add(
-    "recyclability",
-    input.recyclablePct,
-    "Higher recyclable material percentage is better.",
-  );
-  add("packaging", packagingScore(input.packaging), "Lower-impact packaging improves the score.");
-  add("certification", certificationScore(input), "Eco labels and carbon-neutral claims add trust.");
-  add("delivery", deliveryScore(input), "Slower delivery is treated as slightly greener.");
-
-  const availableWeight = breakdown.reduce((sum, item) => sum + item.weight, 0);
-  const weightedScore = breakdown.reduce((sum, item) => sum + item.weightedScore, 0);
-  const score = availableWeight > 0 ? Math.round(weightedScore / availableWeight) : 0;
-  const confidence = Math.round((availableWeight / totalWeight) * 100);
+  const totalWeight = availableWeightSum + missingWeightSum;
+  const scoreObserved = availableWeightSum > 0 ? availableScore / availableWeightSum : 0;
+  const missingRatio = totalWeight > 0 ? missingWeightSum / totalWeight : 0;
+  const scoreFinal = scoreObserved * (1 - ALPHA * missingRatio);
+  const score = Math.round(scoreFinal * 100);
+  const confidence = Math.round((availableWeightSum / totalWeight) * 100);
 
   if (missingFields.length > 0) {
     warnings.push(`Some data is missing, so confidence is ${confidence}%.`);

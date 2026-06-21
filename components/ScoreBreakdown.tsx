@@ -1,12 +1,18 @@
 import type { SustainabilityScoreResult } from "@/lib/scoring";
 
+function barColor(score: number) {
+  if (score < 30) return "bg-red-500";
+  if (score < 60) return "bg-amber-400";
+  return "bg-bol-green";
+}
+
 export default function ScoreBreakdown({
   result,
 }: {
   result: SustainabilityScoreResult;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-3 gap-6">
       {result.calculationBreakdown.map((item) => (
         <div key={item.key}>
           <div className="mb-1 flex items-center justify-between gap-3 text-sm">
@@ -15,7 +21,7 @@ export default function ScoreBreakdown({
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
             <div
-              className="h-full rounded-full bg-bol-green"
+              className={`h-full rounded-full ${barColor(item.score)}`}
               style={{ width: `${item.score}%` }}
             />
           </div>
