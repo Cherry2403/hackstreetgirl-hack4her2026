@@ -114,7 +114,13 @@ export default function ProductJourneyCompare({
                   {row.values.map((value, valueIndex) => (
                     <span
                       key={`${row.label}-${valueIndex}`}
-                      className="font-semibold text-bol-ink"
+                      className={
+                        value === "✓"
+                          ? "text-lg font-black text-green-600"
+                          : value === "×"
+                            ? "text-lg font-black text-rose-500"
+                            : "font-semibold text-bol-ink"
+                      }
                     >
                       {value}
                     </span>
@@ -179,7 +185,6 @@ function journeyRows(products: Product[], step: JourneyStepId): JourneyRow[] {
 
   return compactRows([
     ["Lifespan", products.map((p) => (p.lifespanYears != null ? `${p.lifespanYears} years` : "–"))],
-    ["Price range", products.map(priceRange)],
     [
       "Repairability",
       products.map((p) =>
@@ -207,19 +212,6 @@ function originLabel(label: string): string | null {
 function futureLabel(label: string): string | null {
   if (!label) return null;
   return ["Energy Star", "Cradle to Cradle"].includes(label) ? label : null;
-}
-
-function priceRange(product: Product): string {
-  if (product.priceFrom === product.priceTo) return euro(product.priceFrom);
-  return `${euro(product.priceFrom)} - ${euro(product.priceTo)}`;
-}
-
-function euro(value: number): string {
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 2,
-  }).format(value);
 }
 
 function StepIcon({ step, className = "" }: { step: JourneyStepId; className?: string }) {
