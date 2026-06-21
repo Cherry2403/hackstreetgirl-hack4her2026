@@ -72,7 +72,11 @@ export default async function ProductListRow({ product }: { product: Product }) 
           {productSpecLine(product, lang)}
         </p>
         <div className="mt-1.5">
-          <StarRating rating={product.rating} count={product.reviewCount} size="md" />
+          <StarRating
+            rating={product.rating}
+            count={product.reviewCount}
+            size="md"
+          />
         </div>
         <p className="mt-2 line-clamp-2 max-w-xl text-sm text-zinc-700">
           {productBlurb(product, lang)}
@@ -99,7 +103,9 @@ export default async function ProductListRow({ product }: { product: Product }) 
           )}
         </div>
         {showSustainabilityGrade && product.sustainabilityScore > 75 && (
-          <p className="text-xs font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
+          <p className="text-xs font-bold text-bol-green">
+            🌿 Future-friendly pick
+          </p>
         )}
         {showSustainabilityGrade && <EnergyLabel product={product} />}
         <p className="flex items-center gap-1 text-sm text-bol-green">
@@ -107,10 +113,15 @@ export default async function ProductListRow({ product }: { product: Product }) 
         </p>
         <p className="text-xs text-zinc-500">
           {t("common.soldBy")}{" "}
-          <span className="text-bol-link">{product.warehouseName || "bol"}</span>
+          <span className="text-bol-link">
+            {product.warehouseName || "bol"}
+          </span>
         </p>
         <div className="mt-1">
-          <AddToCartButton label={t("common.addToCart")} addedLabel={t("common.added")} />
+          <AddToCartButton
+            label={t("common.addToCart")}
+            addedLabel={t("common.added")}
+          />
         </div>
       </div>
     </article>

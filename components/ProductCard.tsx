@@ -59,7 +59,9 @@ export default async function ProductCard({
           )}
         </div>
         {showSustainabilityGrade && product.sustainabilityScore > 75 && (
-          <p className="mt-1 text-[11px] font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
+          <p className="mt-1 text-[11px] font-bold text-bol-green">
+            🌿 Future-friendly pick
+          </p>
         )}
         <p className="mt-1 text-[11px] text-zinc-500">
           {product.sameDay
@@ -69,7 +71,9 @@ export default async function ProductCard({
               : t("card.inStock")}
         </p>
         {sponsored && (
-          <p className="mt-1 text-[11px] text-zinc-400">{t("card.sponsored")}</p>
+          <p className="mt-1 text-[11px] text-zinc-400">
+            {t("card.sponsored")}
+          </p>
         )}
       </div>
     </Link>
