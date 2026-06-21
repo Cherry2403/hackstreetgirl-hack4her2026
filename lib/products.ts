@@ -202,6 +202,13 @@ function bool(v: string): boolean {
   return v.toUpperCase() === "TRUE";
 }
 
+function boolOrNull(v: string): boolean | null {
+  const s = v.trim().toUpperCase();
+  if (s === "TRUE") return true;
+  if (s === "FALSE") return false;
+  return null;
+}
+
 /** Deterministic hash → used to derive stable ratings/review counts per product. */
 function hash(str: string): number {
   let h = 2166136261;
@@ -263,24 +270,23 @@ export function getAllProducts(): Product[] {
       const lifespanYears = num(r["Estimated_Lifespan_Years"]);
       const recyclablePct = normaliseRecyclable(num(r["Material_Recyclable_Pct"]));
       const ecoLabel = r["Eco_Label"] ?? "";
-      const carbonNeutral = bool(r["Carbon_Neutral_Certified"]);
+      const carbonNeutral = bool(r["Carbon_Neutral_Certified"] ?? "");
+      const carbonNeutralOrNull = boolOrNull(r["Carbon_Neutral_Certified"] ?? "");
       const packaging = r["Packaging_Type"] ?? "";
       const sameDay = bool(r["IsSameDayAvailable"]);
       const nextDay = bool(r["IsNextDayAvailable"]);
       const normalDelivery = bool(r["IsNormalDeliveryAvailable"]);
       const category = r["Category"] ?? "";
       const sustainability = calculateSustainabilityScore({
-        category,
         co2Kg,
         lifespanYears,
         repairability,
         recyclablePct,
         packaging,
         ecoLabel,
-        carbonNeutral,
-        sameDay,
-        nextDay,
-        normalDelivery,
+        carbonNeutral: carbonNeutralOrNull,
+        warehouseName: r["WarehouseName"] ?? "",
+        countryOfOrigin: r["Country_Of_Origin"] ?? "",
       });
 
       return {
