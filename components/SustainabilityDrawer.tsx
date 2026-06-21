@@ -26,15 +26,25 @@ export default function SustainabilityDrawer({
   const [open, setOpen] = useState(false);
   const result = product.sustainability;
   const ecoImg = ecoLabelImage(product.ecoLabel);
+  const showScore = result.grade === "A" || result.grade === "B";
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-full bg-bol-green px-3 py-1.5 text-sm font-bold text-white hover:bg-bol-green/90"
+        aria-label="View sustainability details"
+        className={
+          showScore
+            ? "inline-flex items-center gap-2 rounded-full bg-bol-green px-3 py-1.5 text-sm font-bold text-white hover:bg-bol-green/90"
+            : "inline-flex h-9 w-9 items-center justify-center rounded-full bg-bol-green text-white hover:bg-bol-green/90"
+        }
       >
-        {result.score}/100 · {result.grade}
+        {showScore ? (
+          `${result.score}/100 · ${result.grade}`
+        ) : (
+          <LeafIcon className="h-5 w-5" />
+        )}
       </button>
 
       {open && (
@@ -68,29 +78,53 @@ export default function SustainabilityDrawer({
             <div className="space-y-4 p-5">
               {/* Score + key facts */}
               <section className="rounded-xl border border-bol-border bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-3xl font-black text-bol-ink">
-                      {result.score}
-                      <span className="text-base font-bold text-zinc-400">/100</span>
-                    </p>
-                    <p className="text-sm text-zinc-500">Sustainability score</p>
-                  </div>
-                  <span
-                    className={`rounded-lg px-3 py-1.5 text-lg font-black text-white ${
-                      GRADE_COLORS[result.grade] ?? "bg-zinc-400"
-                    }`}
-                  >
-                    {result.grade}
-                  </span>
-                </div>
+                {showScore && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-3xl font-black text-bol-ink">
+                          {result.score}
+                          <span className="text-base font-bold text-zinc-400">
+                            /100
+                          </span>
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          Sustainability score
+                        </p>
+                      </div>
+                      <span
+                        className={`rounded-lg px-3 py-1.5 text-lg font-black text-white ${
+                          GRADE_COLORS[result.grade] ?? "bg-zinc-400"
+                        }`}
+                      >
+                        {result.grade}
+                      </span>
+                    </div>
 
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-bol-gray">
-                  <div
-                    className="h-full rounded-full bg-bol-green"
-                    style={{ width: `${result.score}%` }}
-                  />
-                </div>
+                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-bol-gray">
+                      <div
+                        className="h-full rounded-full bg-bol-green"
+                        style={{ width: `${result.score}%` }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {!showScore && (
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-bol-green/10 text-bol-green">
+                      <LeafIcon className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <p className="text-base font-bold text-bol-ink">
+                        Sustainability details
+                      </p>
+                      <p className="text-sm text-zinc-500">
+                        Key product data without a score ranking.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Key facts (no carbon-neutral row) */}
                 <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
@@ -135,13 +169,14 @@ export default function SustainabilityDrawer({
                 <ProductTimeMachine product={product} />
               </section>
 
-              {/* Score breakdown (bars only, no narrative) */}
-              <section className="rounded-xl border border-bol-border bg-white p-4">
-                <h3 className="mb-3 text-base font-bold text-bol-ink">
-                  Score breakdown
-                </h3>
-                <ScoreBreakdown result={result} />
-              </section>
+              {showScore && (
+                <section className="rounded-xl border border-bol-border bg-white p-4">
+                  <h3 className="mb-3 text-base font-bold text-bol-ink">
+                    Score breakdown
+                  </h3>
+                  <ScoreBreakdown result={result} />
+                </section>
+              )}
             </div>
           </aside>
         </div>
@@ -156,5 +191,18 @@ function Fact({ label, value }: { label: string; value: string }) {
       <dt className="text-xs text-zinc-500">{label}</dt>
       <dd className="mt-0.5 font-bold text-bol-ink">{value}</dd>
     </div>
+  );
+}
+
+function LeafIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
+      <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z" />
+    </svg>
   );
 }
