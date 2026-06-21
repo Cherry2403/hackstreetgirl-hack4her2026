@@ -23,6 +23,8 @@ export default async function ProductListRow({ product }: { product: Product }) 
       ? t("buy.deliveryTomorrow")
       : t("buy.deliveryStandard");
   const isLocalProduct = product.countryOfOrigin.toLowerCase() === "netherlands";
+  const showSustainabilityGrade =
+    product.sustainabilityGrade === "A" || product.sustainabilityGrade === "B";
 
   return (
     <article className="grid grid-cols-1 gap-4 border-b border-bol-border py-6 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_220px]">
@@ -92,12 +94,14 @@ export default async function ProductListRow({ product }: { product: Product }) 
       <div className="flex flex-col items-start gap-2 lg:items-end lg:text-right">
         <div className="flex items-center gap-2 lg:justify-end">
           <Price amount={product.price} size="lg" className="text-[#e2240f]" />
-          <SustainabilityScore score={product.sustainabilityScore} />
+          {showSustainabilityGrade && (
+            <SustainabilityScore score={product.sustainabilityScore} />
+          )}
         </div>
-        {product.sustainabilityScore > 75 && (
+        {showSustainabilityGrade && product.sustainabilityScore > 75 && (
           <p className="text-xs font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
         )}
-        <EnergyLabel product={product} />
+        {showSustainabilityGrade && <EnergyLabel product={product} />}
         <p className="flex items-center gap-1 text-sm text-bol-green">
           <ClockIcon className="h-4 w-4" /> {delivery}
         </p>

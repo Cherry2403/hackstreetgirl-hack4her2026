@@ -19,6 +19,9 @@ export default async function ProductCard({
   sponsored = false,
 }: ProductCardProps) {
   const { t } = await getT();
+  const showSustainabilityGrade =
+    product.sustainabilityGrade === "A" || product.sustainabilityGrade === "B";
+
   return (
     <Link
       href={`/product/${product.id}`}
@@ -33,7 +36,7 @@ export default async function ProductCard({
           alt={product.name}
           className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]"
         />
-        {product.sustainabilityScore > 75 && (
+        {showSustainabilityGrade && (
           <span className="absolute left-1.5 top-1.5">
             <SustainabilityScore score={product.sustainabilityScore} />
           </span>
@@ -51,9 +54,11 @@ export default async function ProductCard({
       <div className="mt-auto pt-2">
         <div className="flex items-center justify-between gap-2">
           <Price amount={product.price} size="md" />
-          <SustainabilityScore score={product.sustainabilityScore} />
+          {showSustainabilityGrade && (
+            <SustainabilityScore score={product.sustainabilityScore} />
+          )}
         </div>
-        {product.sustainabilityScore > 75 && (
+        {showSustainabilityGrade && product.sustainabilityScore > 75 && (
           <p className="mt-1 text-[11px] font-bold text-bol-green">🌿 🌍 Future-friendly pick</p>
         )}
         <p className="mt-1 text-[11px] text-zinc-500">
