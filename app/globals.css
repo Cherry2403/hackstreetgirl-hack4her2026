@@ -32,3 +32,91 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ---- Header collectible animal: walks left <-> right ---- */
+/* Outer element traverses across the header width. */
+@keyframes animal-walk {
+  0% {
+    left: 0%;
+    transform: translateX(0);
+  }
+  50% {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+  100% {
+    left: 0%;
+    transform: translateX(0);
+  }
+}
+/* Inner element flips to face the walking direction (snaps at the turn). */
+@keyframes animal-face {
+  0%,
+  49.9% {
+    transform: scaleX(1); /* facing right while moving right */
+  }
+  50%,
+  100% {
+    transform: scaleX(-1); /* facing left while moving left */
+  }
+}
+/* Gentle vertical bob so the gait feels alive. */
+@keyframes animal-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-1.5deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(1.5deg);
+  }
+}
+
+.animal-walker {
+  animation: animal-walk 26s linear infinite;
+}
+.animal-facer {
+  animation: animal-face 26s steps(1) infinite;
+}
+.animal-bobber {
+  animation: animal-bob 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animal-walker,
+  .animal-facer,
+  .animal-bobber {
+    animation: none;
+  }
+}
+
+/* ---- Animal unlock modal animations ---- */
+@keyframes unlock-shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  10%       { transform: rotate(-8deg) scale(1.05); }
+  20%       { transform: rotate(8deg) scale(1.05); }
+  30%       { transform: rotate(-6deg) scale(1.08); }
+  40%       { transform: rotate(6deg) scale(1.08); }
+  50%       { transform: rotate(-10deg) scale(1.1); }
+  60%       { transform: rotate(10deg) scale(1.1); }
+  70%       { transform: rotate(-6deg) scale(1.05); }
+  80%       { transform: rotate(6deg) scale(1.05); }
+  90%       { transform: rotate(-3deg) scale(1.02); }
+}
+
+@keyframes unlock-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.08); opacity: 1; }
+  80%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.animate-unlock-shake {
+  animation: unlock-shake 1.2s ease-in-out infinite;
+}
+
+.animate-unlock-pop {
+  animation: unlock-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
