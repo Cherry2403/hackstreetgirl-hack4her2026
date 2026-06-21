@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import type { Product } from "@/lib/products";
+import ProductJourneyCompare from "@/components/ProductJourneyCompare";
 
 interface ComparisonRow {
   label: string;
@@ -11,6 +13,7 @@ interface ComparisonRow {
 interface ComparisonGroup {
   title: string;
   rows: ComparisonRow[];
+  custom?: ReactNode;
 }
 
 export default function ComparisonTable({ products }: { products: Product[] }) {
@@ -62,24 +65,26 @@ function ComparisonSection({
       </button>
 
       {open && (
-        <div className="divide-y divide-bol-border">
-          {group.rows.map((row, index) => (
-            <div
-              key={row.label}
-              className={`grid gap-3 px-4 py-3 text-sm ${
-                index % 2 === 0 ? "bg-white" : "bg-bol-gray/60"
-              }`}
-              style={{ gridTemplateColumns: gridCols }}
-            >
-              <span className="font-medium text-zinc-600">{row.label}</span>
-              {row.values.map((value, valueIndex) => (
-                <span key={`${row.label}-${valueIndex}`} className="font-semibold text-bol-ink">
-                  {value}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
+        group.custom ?? (
+          <div className="divide-y divide-bol-border">
+            {group.rows.map((row, index) => (
+              <div
+                key={row.label}
+                className={`grid gap-3 px-4 py-3 text-sm ${
+                  index % 2 === 0 ? "bg-white" : "bg-bol-gray/60"
+                }`}
+                style={{ gridTemplateColumns: gridCols }}
+              >
+                <span className="font-medium text-zinc-600">{row.label}</span>
+                {row.values.map((value, valueIndex) => (
+                  <span key={`${row.label}-${valueIndex}`} className="font-semibold text-bol-ink">
+                    {value}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        )
       )}
     </section>
   );
@@ -114,36 +119,11 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
       ]),
     },
     {
-      title: "Durability & use",
-      rows: filterRows([
-        {
-          label: "Lifespan",
-          values: products.map((p) => (p.lifespanYears != null ? `${p.lifespanYears} years` : "–")),
-        },
-        {
-          label: "Repairability",
-          values: products.map((p) =>
-            p.repairability != null ? `${p.repairability}/${p.repairability <= 5 ? 5 : 10}` : "–",
-          ),
-        },
-      ]),
+      title: "Sustainability",
+      rows: [],
+      custom: <ProductJourneyCompare products={products} embedded />,
     },
-    {
-      title: "Materials & labels",
-      rows: filterRows([
-        { label: "Packaging", values: products.map((p) => p.packaging || "–") },
-        {
-          label: "Recyclability",
-          values: products.map((p) => (p.recyclablePct != null ? `${p.recyclablePct}%` : "–")),
-        },
-        {
-          label: "CO₂ footprint",
-          values: products.map((p) => (p.co2Kg != null ? `${p.co2Kg} kg` : "–")),
-        },
-        { label: "Eco-label", values: products.map((p) => p.ecoLabel || "–") },
-      ]),
-    },
-  ].filter((group) => group.rows.length > 0);
+  ].filter((group) => group.custom || group.rows.length > 0);
 }
 
 function filterRows(rows: ComparisonRow[]): ComparisonRow[] {
