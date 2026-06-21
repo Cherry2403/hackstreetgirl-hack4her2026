@@ -109,7 +109,9 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
         { label: "Price", values: products.map((p) => euro(p.price)) },
         {
           label: "Rating",
-          values: products.map((p) => `${p.rating.toFixed(1)} (${p.reviewCount} reviews)`),
+          values: products.map(
+            (p) => `${p.rating.toFixed(1)} (${p.reviewCount} reviews)`,
+          ),
         },
       ]),
     },
@@ -117,8 +119,14 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
       title: "Delivery",
       rows: filterRows([
         { label: "Delivery", values: products.map(deliveryLabel) },
-        { label: "Available today", values: products.map((p) => yesNo(p.sameDay)) },
-        { label: "Available tomorrow", values: products.map((p) => yesNo(p.nextDay)) },
+        {
+          label: "Available today",
+          values: products.map((p) => yesNo(p.sameDay)),
+        },
+        {
+          label: "Available tomorrow",
+          values: products.map((p) => yesNo(p.nextDay)),
+        },
       ]),
     },
     {
@@ -126,7 +134,10 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
       rows: filterRows([
         { label: "Brand", values: products.map((p) => p.brand || "–") },
         { label: "Category", values: products.map((p) => p.category || "–") },
-        { label: "Subcategory", values: products.map((p) => p.subcategory || "–") },
+        {
+          label: "Subcategory",
+          values: products.map((p) => p.subcategory || "–"),
+        },
       ]),
     },
     {
@@ -138,10 +149,6 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
           bestIndex: argmax(products.map((p) => p.sustainabilityScore)),
         },
         {
-          label: "Grade",
-          values: products.map((p) => p.sustainabilityGrade),
-        },
-        {
           label: "Confidence",
           values: products.map((p) => `${p.sustainabilityConfidence}%`),
           bestIndex: argmax(products.map((p) => p.sustainabilityConfidence)),
@@ -149,10 +156,12 @@ function buildGroups(products: Product[]): ComparisonGroup[] {
         {
           label: "Value (pts/€)",
           values: products.map((p) =>
-            p.price > 0 ? (p.sustainabilityScore / p.price).toFixed(2) : "–"
+            p.price > 0 ? (p.sustainabilityScore / p.price).toFixed(2) : "–",
           ),
           bestIndex: argmax(
-            products.map((p) => (p.price > 0 ? p.sustainabilityScore / p.price : -1))
+            products.map((p) =>
+              p.price > 0 ? p.sustainabilityScore / p.price : -1,
+            ),
           ),
         },
         {
