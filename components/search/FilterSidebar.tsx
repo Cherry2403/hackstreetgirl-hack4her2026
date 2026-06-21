@@ -40,7 +40,6 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
   const activeEco = searchParams.get("ecoLabel");
   const activeWarehouse = searchParams.get("warehouse");
   const activeGrade = searchParams.get("grade");
-  const activeMinScore = searchParams.get("minScore");
   const activeMinLifespan = searchParams.get("minLifespan");
   const activeValue = searchParams.get("valuePerYear");
   const carbonNeutral = searchParams.get("carbonNeutral") === "true";
@@ -52,7 +51,6 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
     activeEco ||
     activeWarehouse ||
     activeGrade ||
-    activeMinScore ||
     activeMinLifespan ||
     activeValue ||
     carbonNeutral ||
@@ -131,7 +129,7 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
         <div className="mb-3">
           <p className="mb-1 text-xs font-bold uppercase text-zinc-500">Grade</p>
           <div className="flex flex-wrap gap-1">
-            {["A", "B", "C", "D", "E"].map((grade) => (
+            {["A", "B"].map((grade) => (
               <button
                 key={grade}
                 type="button"
@@ -147,12 +145,6 @@ export default function FilterSidebar({ facets }: FilterSidebarProps) {
             ))}
           </div>
         </div>
-        <NumberFilter
-          label="Minimum score"
-          current={activeMinScore}
-          placeholder="75"
-          onApply={(value) => setParam("minScore", value || null)}
-        />
         <NumberFilter
           label="Minimum lifespan"
           current={activeMinLifespan}

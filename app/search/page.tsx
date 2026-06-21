@@ -103,18 +103,6 @@ export default async function SearchPage(props: PageProps<"/search">) {
             <SortSelect current={sort} />
           </div>
 
-          <FiltersBar />
-
-          {sustainablePopular.length > 0 && (
-            <div className="mb-5 rounded-xl border border-bol-green/30 bg-bol-green/5 px-4">
-              <ProductRail
-                title="Most Sustainable Popular Products"
-                products={sustainablePopular}
-                seeAllHref="/search?minScore=75&sort=combined"
-              />
-            </div>
-          )}
-
           {result.items.length === 0 ? (
             <EmptyState query={q} lang={lang} />
           ) : (

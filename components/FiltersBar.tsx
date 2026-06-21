@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-const GRADES = ["A", "B", "C", "D", "E"];
+const GRADES = ["A", "B"];
 
 export default function FiltersBar() {
   const router = useRouter();
@@ -17,7 +17,6 @@ export default function FiltersBar() {
   }
 
   const activeGrade = searchParams.get("grade");
-  const minScore = searchParams.get("minScore");
   const minLifespan = searchParams.get("minLifespan");
   const valuePerYear = searchParams.get("valuePerYear");
 
@@ -38,15 +37,6 @@ export default function FiltersBar() {
           Grade {grade}
         </button>
       ))}
-      <button
-        type="button"
-        onClick={() => setParam("minScore", "75")}
-        className={`rounded-full px-3 py-1 text-sm font-bold ${
-          minScore === "75" ? "bg-bol-green text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-        }`}
-      >
-        75+ score
-      </button>
       <button
         type="button"
         onClick={() => setParam("minLifespan", "3")}
