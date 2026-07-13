@@ -1,26 +1,169 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HackStreetGirl
+
+HackStreetGirl is a sustainability-focused extension of the bol.com shopping experience developed during **Hack4Her 2026**. The project encourages environmentally conscious shopping by providing sustainability insights, greener alternatives, and gamified rewards that make sustainable purchasing more engaging and transparent.
+
+---
+
+## Implemented Features
+
+### 🏠 Home Page
+- Added a **"Winkel slim. Kies duurzaam"** section at the top of the homepage.
+- Added an **"Ontdek duurzame producten"** button that redirects users to a page containing products labeled **"Goede keuze"** and **"Lokaal product"**.
+- Added a **"🌿 Meest duurzame keuzes"** section above the **"Populair op bol"** section.
+- Added sustainability indicators for highly sustainable products:
+    - Sustainability Score (0–100), shown only when the score is **70 or higher**.
+    - Sustainability Grade (A–E), shown only for **Grade A** and **Grade B** products.
+    - A **"🌿 Future-friendly pick"** label displayed beneath the product price.
+
+---
+
+### ⚖️ Comparison Page
+- added a "sustainability scores" section displaying: 
+    - Score
+    - Confidence
+    - Value
+    - Carbon neutral, 
+- Highlights the most sustainable product in **green**.
+- Added a **Sustainability Journey** section showing the complete product lifecycle for each compared product.
+
+---
+
+### 📦 Product Page
+- Added the Sustainability Score and Sustainability Grade for eligible products.
+- Added a **Greener Alternatives** section recommending more sustainable products.
+- Added a **Duurzaamheid** subsection within **Productspecificaties**, including:
+    - Sustainability Score
+    - CO₂ Footprint
+    - Eco-label
+    - Carbon Neutral Certification
+    - Packaging
+    - Repairability Score
+    - Recyclable Material
+    - Estimated Lifespan
+    - Country of Origin
+- Made the **Sustainability Score** clickable to display detailed sustainability information, including:
+    - CO2 footprint
+    - Recyclability score
+    - Carbon neutrality score
+    - Warehouse score
+    - Country of origin score
+    - Confidence score
+    - Sustainability per euro
+    - Impact analogy
+    - Product lifecycle, containing:
+        - **Production Information**
+            - CO₂ footprint
+            - Vountry of origin
+            - Carbon neutrality
+        - **Delivery options**
+            - Standard
+            - Next day
+            - Same day
+        - **Lifetime value**
+            - Recyclability score
+- Made the **Confidence Score** clickable to explain how the Sustainability Score is calculated. The popup includes:
+    - The complete scoring formula:
+
+    ```
+    Score =
+    (Σ component × weight ÷ Σ active weights)
+    × (1 − 0.3 × missing ratio)
+    ```
+
+    - The weighting of each sustainability component:
+        - CO₂ Footprint (35%)
+        - Packaging (15%)
+        - Eco-label (5%)
+        - Warehouse (5%)
+        - Country of Origin (5%)
+
+    - Sustainability grade thresholds:
+        - Grade A: ≥ 85
+        - Grade B: ≥ 70
+        - Grade C: ≥ 55
+        - Grade D: ≥ 40
+        - Grade E: < 40
+
+    - A **pie chart** visualizing the contribution of each sustainability component to the final score.
+
+---
+
+### 🛍️ Product List
+Added sustainability-related filters:
+
+#### Sustainability
+- Grade
+- Minimum Lifespan
+- Best Price/Lifespan Value
+- Carbon Neutral Certified
+- Energy Star
+- EU Ecolabel
+- Fair Trade
+- Cradle to Cradle
+- FSC Certified
+
+#### Warehouse
+- BFC Site 1
+- BFC Site 2
+- BFC XL
+- BFC XL 2
+- Ingram Micro
+
+---
+
+### 🛒 Checkout
+- Added a **"Nieuw dier verdiend"** popup that appears after completing a sustainable purchase.
+- Rewards users with a new endangered animal to collect.
+- Displays fun facts about the unlocked animal to encourage continued sustainable shopping.
+
+---
+
+### 👤 Profile
+- Added a **"Mijn dierencollectie"** section where users can view all endangered animals they have unlocked.
+- Added a **"Toon in header"** button, allowing users to display their favorite collected animal in the application header.
+
+---
+
+## Technology Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Node.js
+- npm
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open:
+
+```
+http://localhost:3000
+```
+
+in your browser.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
 ## Learn More
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 To learn more about Next.js, take a look at the following resources:
 
