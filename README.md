@@ -17,14 +17,36 @@ HackStreetGirl is a sustainability-focused extension of the bol.com shopping exp
 
 ---
 
-### ⚖️ Comparison Page
-- added a "sustainability scores" section displaying: 
-    - Score
-    - Confidence
-    - Value
-    - Carbon neutral, 
-- Highlights the most sustainable product in **green**.
-- Added a **Sustainability Journey** section showing the complete product lifecycle for each compared product.
+### 🛍️ Product List
+Added sustainability-related filtering and sorting options.
+
+#### Filters:
+
+**Sustainability**
+- Grade
+- Minimum Lifespan
+- Best Price/Lifespan Value
+- Eco label:
+    - Carbon Neutral Certified
+    - Energy Star
+    - EU Ecolabel
+    - Fair Trade
+    - Cradle to Cradle
+    - FSC Certified
+
+**Warehouse**
+- BFC Site 1
+- BFC Site 2
+- BFC XL
+- BFC XL 2
+- Ingram Micro
+
+#### Sorting Options:
+Added sorting options based on:
+- Sustainability
+- Lifespan
+- Price per year of lifespan
+- Price, delivery, and sustainability
 
 ---
 
@@ -53,7 +75,7 @@ HackStreetGirl is a sustainability-focused extension of the bol.com shopping exp
     - Product lifecycle, containing:
         - **Production Information**
             - CO₂ footprint
-            - Vountry of origin
+            - Country of origin
             - Carbon neutrality
         - **Delivery options**
             - Standard
@@ -64,18 +86,29 @@ HackStreetGirl is a sustainability-focused extension of the bol.com shopping exp
 - Made the **Confidence Score** clickable to explain how the Sustainability Score is calculated. The popup includes:
     - The complete scoring formula:
 
-    ```
+    <!-- ```
     Score =
     (Σ component × weight ÷ Σ active weights)
     × (1 − 0.3 × missing ratio)
-    ```
+    ``` -->
+
+    $$
+    Score =
+    \left(\frac{\sum(component \times weight)}
+    {\sum(active\_weights)}\right)
+    \times (1 - 0.3 \times missing\_ratio)
+    $$
 
     - The weighting of each sustainability component:
         - CO₂ Footprint (35%)
         - Packaging (15%)
+        - Recyclable Material (10%)
+        - Repairability (10%)
+        - Lifespan (10%)
         - Eco-label (5%)
+        - Carbon Neutrality (5%)
         - Warehouse (5%)
-        - Country of Origin (5%)
+        - Distance (5%)
 
     - Sustainability grade thresholds:
         - Grade A: ≥ 85
@@ -88,26 +121,14 @@ HackStreetGirl is a sustainability-focused extension of the bol.com shopping exp
 
 ---
 
-### 🛍️ Product List
-Added sustainability-related filters:
-
-#### Sustainability
-- Grade
-- Minimum Lifespan
-- Best Price/Lifespan Value
-- Carbon Neutral Certified
-- Energy Star
-- EU Ecolabel
-- Fair Trade
-- Cradle to Cradle
-- FSC Certified
-
-#### Warehouse
-- BFC Site 1
-- BFC Site 2
-- BFC XL
-- BFC XL 2
-- Ingram Micro
+### ⚖️ Comparison Page
+- Added a **Sustainability Scores** section displaying:
+    - Score
+    - Confidence
+    - Value
+    - Carbon neutral, 
+- Highlights the most sustainable product in **green**.
+- Added a **Sustainability Journey** section showing the complete product lifecycle for each compared product.
 
 ---
 
@@ -159,6 +180,8 @@ in your browser.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+---
+
 ## Learn More
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
@@ -171,8 +194,6 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
